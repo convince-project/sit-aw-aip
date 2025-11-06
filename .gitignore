@@ -1,0 +1,29 @@
+#build artifacts
+__pycache__/
+dist/
+build/
+*.egg-info/
+*.py[codz]
+*$py.class
+
+#virtual envs
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+#project related
+/Mllm-conf-mat
+
+/Dockerfile
+/docker-compose.yaml
+/.dockerignore
+
+*.txt
+!licence-gpl-3.txt
+
+#critics repo
+critics_convince/
