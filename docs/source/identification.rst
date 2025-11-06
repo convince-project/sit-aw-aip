@@ -131,7 +131,7 @@ UC2
 | timestamp     | name         | position   |
 +===============+==============+============+
 | {timestamp_0} | gripper_jaws | {value_0}  |
-+-------------+---------------+-------------+
++---------------+--------------+------------+
 
 Other names in the *name* column can be present, but the **gripper_jaws** has to be.
 
