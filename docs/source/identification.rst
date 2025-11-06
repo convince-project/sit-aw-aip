@@ -1,6 +1,9 @@
 Inference with VLM 
 ==================
 
+Installations
+--------------
+
 Clone project
 """""""""""""
 
@@ -65,34 +68,32 @@ UC1
 **The excel files columns and representation (elements in brackets represent numbers) - please refer for your data structure** :
 
 *clif_sensors_data.xlsx* :
-+---------------+-----------+
-|               | Data      |
-+===============+===========+
-| {timestamp_0} | {value_0} |
-+---------------+-----------+
-
+=================  ===========
+                  Data
+=================  ===========
+{timestamp_0}      {value_0}
+=================  ===========
 
 *imu_data_data.xlsx* :
-+---------------+---------------+---------------------------+--------------------+-------------------------------+-----------------------+---------------------------------------+
-|               | Orientation   | Orientation covariance    | Angular velocity   | Angular velocity covariance    | Linear Acceleration   | Linear Acceleration covariance        |
-+===============+===============+===========================+====================+===============================+=======================+=======================================+
-| {timestamp_0} | {[list]}      | {[list]}                 | {[list]}           | {[list]}                      | {[list]}              | {[list]}                              |
-+---------------+---------------+---------------------------+--------------------+-------------------------------+-----------------------+---------------------------------------+
+=================  ================  ===========================  ====================  ===============================  =======================  =======================================
+                  Orientation        Orientation covariance       Angular velocity      Angular velocity covariance      Linear Acceleration      Linear Acceleration covariance
+=================  ================  ===========================  ====================  ===============================  =======================  =======================================
+{timestamp_0}      {[list]}          {[list]}                     {[list]}              {[list]}                         {[list]}                 {[list]}
+=================  ================  ===========================  ====================  ===============================  =======================  =======================================
 
 *odometrie_data.xlsx*
-+---------------+----------------+--------------------+------------------+---------------+----------------+------------------+
-|               | Pose position  | Pose orientation   | Pose covariance  | Twist linear  | Twist angular  | Twist covariance |
-+===============+================+====================+==================+===============+================+==================+
-| {timestamp_0} | {[list]}       | {[list]}           | {[list]}         | {[list]}      | {[list]}       | {[list]}         |
-+---------------+----------------+--------------------+------------------+---------------+----------------+------------------+
-
+=================  ================  ====================  ==================  ===============  ================  ==================
+                  Pose position      Pose orientation      Pose covariance     Twist linear     Twist angular     Twist covariance
+=================  ================  ====================  ==================  ===============  ================  ==================
+{timestamp_0}      {[list]}          {[list]}              {[list]}             {[list]}         {[list]}          {[list]}
+=================  ================  ====================  ==================  ===============  ================  ==================
 
 *wheel_lift_data.xlsx*
-+---------------+-----------+
-|               | Data      |
-+===============+===========+
-| {timestamp_0} | {value_0} |
-+---------------+-----------+
+=================  ===========
+                  Data
+=================  ===========
+{timestamp_0}      {value_0}
+=================  ===========
 
 .. _uc2:
 UC2
@@ -100,28 +101,28 @@ UC2
 
 .. code-block:: bash
 
--- root 
-  -- Anomaly 1
-    -- block 1
-      -- folder 1 (the name is not important)
-        chest_cam_video.mp4
-        proprioception.csv
-      -- folder 2 (the name is not important)
-        scan_image.png
-      -- json_files (optional)
-    -- block 2 (same as block1)
-    -- block 3 (same as block1)
+    -- root 
+    -- Anomaly 1
+        -- block 1
+        -- folder 1 (the name is not important)
+            chest_cam_video.mp4
+            proprioception.csv
+        -- folder 2 (the name is not important)
+            scan_image.png
+        -- json_files (optional)
+        -- block 2 (same as block1)
+        -- block 3 (same as block1)
+        -- (repeat)
+    -- Anomaly 2 (same as Anomaly 1)
     -- (repeat)
-  -- Anomaly 2 (same as Anomaly 1)
-  -- (repeat)
 
 **Csv file columns and representation (elements in brackets represent numbers) - please refer for your data structure**
 
-+-------------+---------------+-------------+
-| timestamp   | name          | position    |
-+=============+===============+=============+
-| {timestamp_0} | gripper_jaws | {value_0}   |
-+-------------+---------------+-------------+
+=============  ==============  ===========
+timestamp      name            position
+=============  ==============  ===========
+{timestamp_0}  gripper_jaws    {value_0}
+=============  ==============  ===========
 
 Other names in the *name* column can be present, but the **gripper_jaws** has to be.
 

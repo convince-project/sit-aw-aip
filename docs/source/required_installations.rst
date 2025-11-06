@@ -37,6 +37,7 @@ Install packages
 """"""""""""""""
 
 .. code-block:: bash
+
     sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 Start docker services if disabled

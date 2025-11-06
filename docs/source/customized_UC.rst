@@ -1,4 +1,4 @@
-Customized UC -- Goes through corresponding
+Customized UC -- Goes through coding
 ===========================================
 
 **You can build your own UC by adding elements to the projects.**

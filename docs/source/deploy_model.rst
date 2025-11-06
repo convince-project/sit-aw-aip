@@ -25,13 +25,17 @@ Optional - Clone only the corresponding folder
     git sparse-checkout set /vLLM-hosting
     git checkout
 
-Else clone the whole project and consider only** *vLLM-hosting* folder
+Else clone the whole project and consider only *vLLM-hosting* folder
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. code-block:: bash
 
     git clone https://gitlab.lri.cea.fr/razane.azrou/convincesitaw-mllm.git
     cd convincesitaw-mllm/vLLM-hosting
+
+
+Run and build
+--------------
 
 
 Then execute **bash file**
