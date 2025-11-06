@@ -5,17 +5,17 @@ from convincesitaw_mllm.synchronized_input_multimodal_data.SIMD_UC2 import UC2
 from convincesitaw_mllm.inference_message.message_uc2 import Message_UC2
 from convincesitaw_mllm.inference_message.message_uc1 import Message_UC1
 
-use_case_prompt ={
+use_case_prompt_map ={
         1:sys_prompts_UC1.SYSTEM_PROMPT,
         2: sys_prompts_UC2.SYSTEM_PROMPT
 }
 
-use_case = {
+use_case_map = {
         1:UC1(),
         2: UC2()
 }
 
-message_callback = {
+message_callback_map = {
         1: Message_UC1,
         2: Message_UC2
 }

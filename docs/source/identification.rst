@@ -22,6 +22,7 @@ Build your project - Once
 
 Activate virtual env - everytime you enter the project
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
+
 .. code-block:: bash   
 
     source .venv/bin/activate

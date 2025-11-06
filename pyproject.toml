@@ -37,11 +37,11 @@ dependencies = [
   "av",
   "python-dotenv",
   "openpyxl",
-  "critics",
+  "sit_aw_critics",
 ]
 
 [tool.uv.sources]
-critics = {git = "https://github.com/convince-project/sit-aw-critics.git", branch = "DamienALOUGES-patch-1"}
+sit_aw_critics = {git = "https://github.com/convince-project/sit-aw-critics.git", branch= "mwe"}
 
 [project.scripts]
 fData = "convincesitaw_mllm.generate_json_files:cli"

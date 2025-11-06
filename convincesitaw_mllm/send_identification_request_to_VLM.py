@@ -1,6 +1,6 @@
 #SIT-AW  Copyright (C) CEA 2025  Razane Azrou
 from convincesitaw_mllm.inference.main import Inference
-from critics.critics import critics_trigger_reply1,critics_trigger_reply2
+from sit_aw_critics.critics import critics_trigger_reply1,critics_trigger_reply2
 import tyro
 from dotenv import load_dotenv
 import os

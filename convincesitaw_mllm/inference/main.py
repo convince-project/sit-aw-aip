@@ -1,7 +1,7 @@
 #SIT-AW  Copyright (C) CEA 2025  Razane Azrou
 from litellm import completion
 from convincesitaw_mllm.prompts import user_prompts
-from Ucs_mapping import use_case,use_case_prompt,message_callback
+from convincesitaw_mllm.inference.Ucs_mapping import use_case_map,use_case_prompt_map,message_callback_map
 from convincesitaw_mllm.inference_message.message_abstract import Message
 from dataclasses import dataclass
 
@@ -28,11 +28,11 @@ class Inference:
 
     def get_use_case(self,sys_prompt=None):
 
-        use_case = use_case[self.use_case_id]
-        message_callback = message_callback[self.use_case_id]
+        use_case = use_case_map[self.use_case_id]
+        message_callback = message_callback_map[self.use_case_id]
 
         if not sys_prompt:
-            sys_prompt = use_case_prompt[self.use_case_id]
+            sys_prompt = use_case_prompt_map[self.use_case_id]
             
         prompt1 = user_prompts.USER_PROMPT1
         prompt2 = user_prompts.USER_PROMPT2
