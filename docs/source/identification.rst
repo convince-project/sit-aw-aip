@@ -69,7 +69,7 @@ UC1
 
 **The excel files columns and representation (elements in brackets represent numbers) - please refer for your data structure** :
 
-*clif_sensors_data.xlsx* :
+clif_sensors_data.xlsx :
 
 +---------------+-----------+
 |               | Data      |
@@ -78,15 +78,15 @@ UC1
 +---------------+-----------+
 
 
-*imu_data_data.xlsx* :
+imu_data_data.xlsx :
 
 +---------------+---------------+---------------------------+--------------------+-------------------------------+-----------------------+----------------------------------------+
-|               | Orientation   | Orientation covariance    | Angular velocity   | Angular velocity covariance    | Linear Acceleration   | Linear Acceleration covariance        |
+|               | Orientation   | Orientation covariance    | Angular velocity   | Angular velocity covariance   | Linear Acceleration   | Linear Acceleration covariance         |
 +===============+===============+===========================+====================+===============================+=======================+========================================+
-| {timestamp_0} | {[list]}      | {[list]}                 | {[list]}           | {[list]}                      | {[list]}              | {[list]}                                |
+| {timestamp_0} | {[list]}      | {[list]}                  | {[list]}           | {[list]}                      | {[list]}              | {[list]}                               |
 +---------------+---------------+---------------------------+--------------------+-------------------------------+-----------------------+----------------------------------------+
 
-*odometrie_data.xlsx*:
+odometrie_data.xlsx:
 
 +---------------+----------------+--------------------+------------------+---------------+----------------+------------------+
 |               | Pose position  | Pose orientation   | Pose covariance  | Twist linear  | Twist angular  | Twist covariance |
@@ -95,7 +95,7 @@ UC1
 +---------------+----------------+--------------------+------------------+---------------+----------------+------------------+
 
 
-*wheel_lift_data.xlsx*:
+wheel_lift_data.xlsx:
 
 +---------------+-----------+
 |               | Data      |
@@ -127,9 +127,9 @@ UC2
 
 **Csv file columns and representation (elements in brackets represent numbers) - please refer for your data structure**
 
-+-------------+---------------+-------------+
-| timestamp   | name          | position    |
-+=============+===============+=============+
++---------------+--------------+------------+
+| timestamp     | name         | position   |
++===============+==============+============+
 | {timestamp_0} | gripper_jaws | {value_0}  |
 +-------------+---------------+-------------+
 
