@@ -7,7 +7,6 @@ build/
 *$py.class
 
 #virtual envs
-.env
 .venv
 env/
 venv/
