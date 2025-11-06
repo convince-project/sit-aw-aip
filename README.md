@@ -3,7 +3,7 @@ The deployment of the VLM is explained in [here](#vlm-deployement).
 And the way to communicate with the model [here](#inference-with-vlm), given [CONVINCE](https://convince-project.eu/) use cases. For now only UC1, vacuum cleaner, and UC2, assembly robot.
 The last [section](#customize-communication) explains how to custom the communication.
 
-The tests have been done only on LINUX, but the use of docker should make it exploitable on all OSs. 
+The tests have been done only on LINUX. 
 
 # Requirements : Install docker
 
