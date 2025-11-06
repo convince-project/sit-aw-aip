@@ -24,6 +24,7 @@ venv.bak/
 
 *.txt
 !licence-gpl-3.txt
+!requirements.txt
 
 #critics repo
 critics_convince/
