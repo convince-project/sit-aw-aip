@@ -1,9 +1,9 @@
 CONVINCE SIT-AW-AIP
 ===================
 
-SIT-AW-AIP implements a pipeline for the identification of situational anomalies in robot operation. Anomaly identification is a crucial component in a robot situation awareness framework.
+This project allows to use a VLM for anomaly identification. The deployment of the VLM is explained and the way to communicate with the model, given CONVINCE use cases. For now only UC1, vacuum cleaner, and UC2, assembly robot. The last section explains how to custom the communication.
 
-In this documentation we introduce the generic principles behind SIT-AW-AIP. Then, we describe how to build and run SIT-AW-AIP. Finally, we provide a tutorial to see SIT-AW-AIP in action.
+The tests have been done only on LINUX.
 
 Contents
 --------
@@ -11,5 +11,7 @@ Contents
 .. toctree::
 
    generic_principles
-   installation
-   tutorials
+   required_installations
+   deploy_model
+   identification
+   customized_UC
