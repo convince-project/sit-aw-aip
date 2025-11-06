@@ -1,0 +1,63 @@
+# SIT-AW  Copyright (C) CEA 2025  Razane Azrou
+[project]
+name = "convincesitaw_mllm"
+version = "0.1.0"
+requires-python = "==3.10.*"
+description = "MLLM pipeline for anomaly handling for enhacing robotic systems' autonomy in the context of situation awareness"
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [
+    {name = "Razane Azrou", email = "razane.azrou@cea.fr"},
+    {name = "Vaiyee Huynh", email = "vaiyee.huynh@cea.fr"},
+    {name = "Nathan Damette", email = "nathan.damette@cea.fr"}
+]
+keywords = [
+    "robotics",
+    "ai",
+    "awareness",
+    "situation",
+    "vision-language-models",
+    "multimodal",
+    "anomaly",
+    "identification",
+]
+
+dependencies = [
+  "numpy",
+  "pandas",
+  "abcplus",
+  "aiohttp==3.12.11",
+  "litellm>=1.72.4",
+  "spatialmath-python>=1.1.14",
+  "pybase64",
+  "torch",
+  "torchvision",
+  "dataclasses",
+  "ffmpeg-python",
+  "tyro",
+  "av",
+  "python-dotenv",
+  "openpyxl",
+  "critics",
+]
+
+[tool.uv.sources]
+critics = {git = "https://github.com/convince-project/sit-aw-critics.git", branch = "DamienALOUGES-patch-1"}
+
+[project.scripts]
+fData = "convincesitaw_mllm.generate_json_files:cli"
+identif = "convincesitaw_mllm.send_identification_request_to_VLM:cli"
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["convincesitaw_mllm"]
+
+[tool.uv.workspace]
+members = []
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

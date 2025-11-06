@@ -1,0 +1,20 @@
+#SIT-AW  Copyright (C) CEA 2025  Razane Azrou
+services:
+  vllm_server:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      GPU_MEMORY_USAGE: ${GPU_MEMORY_USAGE}
+      PORT: ${PORT}
+      MODEL: ${MODEL}
+    runtime: nvidia
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - ${DOWNLOAD_MODEL_CACHE_DIR}:/root/.cache/huggingface
+    ipc: host
+      
+
+      
