@@ -38,6 +38,7 @@ Format data - generate json (Once on a desired batch of data)
     --root_path {root_path}
 
 .. _variables: 
+
 Variables 
 """""""""
 
@@ -46,6 +47,7 @@ Variables
 **root_path** : root_path to all anomalies data, the folders need to be structured this way given the use case :
 
 .. _uc1:
+
 UC1
 """
 
@@ -68,34 +70,41 @@ UC1
 **The excel files columns and representation (elements in brackets represent numbers) - please refer for your data structure** :
 
 *clif_sensors_data.xlsx* :
-=================  ===========
-                  Data
-=================  ===========
-{timestamp_0}      {value_0}
-=================  ===========
+
++---------------+-----------+
+|               | Data      |
++===============+===========+
+| {timestamp_0} | {value_0} |
++---------------+-----------+
+
 
 *imu_data_data.xlsx* :
-=================  ================  ===========================  ====================  ===============================  =======================  =======================================
-                  Orientation        Orientation covariance       Angular velocity      Angular velocity covariance      Linear Acceleration      Linear Acceleration covariance
-=================  ================  ===========================  ====================  ===============================  =======================  =======================================
-{timestamp_0}      {[list]}          {[list]}                     {[list]}              {[list]}                         {[list]}                 {[list]}
-=================  ================  ===========================  ====================  ===============================  =======================  =======================================
 
-*odometrie_data.xlsx*
-=================  ================  ====================  ==================  ===============  ================  ==================
-                  Pose position      Pose orientation      Pose covariance     Twist linear     Twist angular     Twist covariance
-=================  ================  ====================  ==================  ===============  ================  ==================
-{timestamp_0}      {[list]}          {[list]}              {[list]}             {[list]}         {[list]}          {[list]}
-=================  ================  ====================  ==================  ===============  ================  ==================
++---------------+---------------+---------------------------+--------------------+-------------------------------+-----------------------+----------------------------------------+
+|               | Orientation   | Orientation covariance    | Angular velocity   | Angular velocity covariance    | Linear Acceleration   | Linear Acceleration covariance        |
++===============+===============+===========================+====================+===============================+=======================+========================================+
+| {timestamp_0} | {[list]}      | {[list]}                 | {[list]}           | {[list]}                      | {[list]}              | {[list]}                                |
++---------------+---------------+---------------------------+--------------------+-------------------------------+-----------------------+----------------------------------------+
 
-*wheel_lift_data.xlsx*
-=================  ===========
-                  Data
-=================  ===========
-{timestamp_0}      {value_0}
-=================  ===========
+*odometrie_data.xlsx*:
+
++---------------+----------------+--------------------+------------------+---------------+----------------+------------------+
+|               | Pose position  | Pose orientation   | Pose covariance  | Twist linear  | Twist angular  | Twist covariance |
++===============+================+====================+==================+===============+================+==================+
+| {timestamp_0} | {[list]}       | {[list]}           | {[list]}         | {[list]}      | {[list]}       | {[list]}         |
++---------------+----------------+--------------------+------------------+---------------+----------------+------------------+
+
+
+*wheel_lift_data.xlsx*:
+
++---------------+-----------+
+|               | Data      |
++===============+===========+
+| {timestamp_0} | {value_0} |
++---------------+-----------+
 
 .. _uc2:
+
 UC2
 """
 
@@ -118,11 +127,11 @@ UC2
 
 **Csv file columns and representation (elements in brackets represent numbers) - please refer for your data structure**
 
-=============  ==============  ===========
-timestamp      name            position
-=============  ==============  ===========
-{timestamp_0}  gripper_jaws    {value_0}
-=============  ==============  ===========
++-------------+---------------+-------------+
+| timestamp   | name          | position    |
++=============+===============+=============+
+| {timestamp_0} | gripper_jaws | {value_0}  |
++-------------+---------------+-------------+
 
 Other names in the *name* column can be present, but the **gripper_jaws** has to be.
 
