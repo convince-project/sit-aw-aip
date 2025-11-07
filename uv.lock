@@ -277,7 +277,7 @@ requires-dist = [
 [[package]]
 name = "critics"
 version = "0.1.0"
-source = { git = "https://github.com/convince-project/sit-aw-critics.git?branch=mwe#d448ce52b94acfe9b3db959f1cd6f2d09dc26e2f" }
+source = { git = "https://github.com/convince-project/sit-aw-critics.git?branch=mwe#f8d5a11485856ef98cff72b1142acb2bbd1e1ceb" }
 
 [[package]]
 name = "cycler"

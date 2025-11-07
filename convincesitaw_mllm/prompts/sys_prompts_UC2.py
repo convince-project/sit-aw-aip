@@ -43,8 +43,9 @@ For your analysis, would you like to simply fill this JSON structure with realis
             "at_the_end": {
                 "mean_position": number,
                 "is_gripper_zero": true or false,
-            },
-        },
+            }
+        }
+    },
     "task": {
         "performed_task": "pick block", "move mobile base" or "place block",
     },
@@ -91,7 +92,7 @@ Previous response:
     },
     "task": {
         "performed_task": "pick block"
-    }
+    },
 }
 ```"
 Correct situation: 3. I picked nothing and a human has been detected (one probably intervened in your task).
@@ -128,7 +129,7 @@ Previous response:
     },
     "task": {
         "performed_task": "pick block"
-    }
+    },
 }
 ```"
 Correct situation: 3. I picked nothing and a human has been detected (one probably intervened in your task).
@@ -165,7 +166,7 @@ Previous response:
     },
     "task": {
         "performed_task": "pick block"
-    }
+    },
 }
 ```"
 Correct situation: 1. I picked a block.
@@ -202,7 +203,7 @@ Previous response:
     },
     "task": {
         "performed_task": "pick block"
-    }
+    },
 }
 ```"
 Correct situation: 4. I picked nothing and no human has been detected.
@@ -239,7 +240,7 @@ Previous response:
     },
     "task": {
         "performed_task": "pick block"
-    }
+    },
 }
 ```"
 Correct situation: 4. I picked nothing and no human has been detected.
@@ -276,7 +277,7 @@ Previous response:
     },
     "task": {
         "performed_task": "pick block"
-    }
+    },
 }
 ```"
 Correct situation: 2. I picked an object which is not a block.
