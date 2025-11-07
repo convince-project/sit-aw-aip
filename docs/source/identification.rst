@@ -18,7 +18,7 @@ Build your project - Once
 
 .. code-block:: bash 
 
-    uv sync --frozen 
+    uv sync 
 
 Activate virtual env - everytime you enter the project
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
