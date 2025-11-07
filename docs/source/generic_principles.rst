@@ -1,7 +1,7 @@
 Generic Principles
 ==================
 
-Situation understanding within the CONVINCE project consists in detecting, identifying and mitigation anomalies. The context being robotic systems performing a task, anomalies correspond to failures
+Situation understanding within the CONVINCE project consists in detecting, identifying and mitigating anomalies. The context being robotic systems performing a task, anomalies correspond to failures
 that may occurre and interrupt the nominal behaviour of the robot while performing its computed task.
 
 Within this project we focus on the identification of anomalies. Anomalies are failures
