@@ -57,10 +57,10 @@ UC1
     -- root 
     -- Anomaly 1
         -- excel_files
-            clif_sensors_data.xlsx
-            imu_data_data.xlsx
-            odometrie_data.xlsx
-            wheel_lift_data.xlsx
+                clif_sensors_data.xlsx
+                imu_data_data.xlsx
+                odometrie_data.xlsx
+                wheel_lift_data.xlsx
         --images
             [all images files]
         -- json_files (optional)
@@ -115,10 +115,10 @@ UC2
     -- Anomaly 1
         -- block 1
             -- folder 1 (the name is not important)
-                chest_cam_video.mp4
-                proprioception.csv
+                    chest_cam_video.mp4
+                    proprioception.csv
             -- folder 2 (the name is not important)
-                scan_image.png
+                    scan_image.png
             -- json_files (optional)
         -- block 2 (same as block1)
         -- block 3 (same as block1)
