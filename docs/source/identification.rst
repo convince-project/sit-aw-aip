@@ -28,7 +28,7 @@ Activate virtual env - everytime you enter the project
     source .venv/bin/activate
 
 Change environment variables
-""""""""""""""""""""""""""""
+----------------------------
 
 You will have to change the variables within *.env* to match the one defined when deploying
 the model.
