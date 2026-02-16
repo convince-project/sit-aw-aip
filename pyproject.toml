@@ -22,7 +22,7 @@ keywords = [
 ]
 
 dependencies = [
-  "numpy",
+  "numpy==1.26.4",
   "pandas",
   "abcplus",
   "aiohttp==3.12.11",

@@ -54,7 +54,7 @@ Variables
 UC1
 """
 
-**Think about sourcing your ROS environment and building any interfaces**
+**Think about sourcing your ROS environment and building any interfaces. The data need to be stored in a rosbag.**
 
 .. code-block:: bash 
 

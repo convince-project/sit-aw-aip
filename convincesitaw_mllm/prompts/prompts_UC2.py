@@ -42,7 +42,7 @@ Gripper state has priority over visual motion.
 3. **The robot picked nothing and no human has been seen**
 
 **[OUTPUT FORMAT]**
-For your analysis, would you like to simply fill this JSON structure with realistic data:
+For your analysis, provide an explanation (few sentences) describing what observations led to your conclusion and fill this JSON structure with realistic data:
 {
     **Object Type**: the object picked by the robot, if any.
     **Human Presence**: present or Absent.
@@ -76,10 +76,8 @@ Follow these steps:
 
 4. Produce your final answer.
 
-Requirements:
-- Provide a short explanation (a few sentences) describing what observations led to your conclusion.
-- Output the result strictly using the following JSON structure:
-
+As a reminder the required output contains :
+An explanation (few sentences) describing what observations led to your conclusion and the following JSON structure synthetizing your final answer :
 {
     "Object Type": "...",
     "Human Presence": "present" or "absent",

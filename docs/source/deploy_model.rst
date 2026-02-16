@@ -41,7 +41,7 @@ The **.env** file allows you to change and define some parameters
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 - **MODEL** : The model to deploy - default Qwen2.5-VL
 - **PORT** : Exposed and container port - default 23333
-- **GPU_MEMORY_USAGE** : The portion (< 1) of GPU usage allowed to the model given GPU capacities -- default 0.85
+- **GPU_MEMORY_USAGE** : The portion (< 1) of GPU usage allowed to the model given GPU capacities -- default 0.99
 - **DOWNLOAD_MODEL_CACHE_DIR** : Machine's directory to download cached model to - default "./.cache/huggingface"
 
 ⚠ **Changing the model may need different GPU memory usage or disk capacity to where to download the cached model. It is quite specific to the model, so you may need a more powerful machine**

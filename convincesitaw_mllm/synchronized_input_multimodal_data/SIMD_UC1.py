@@ -134,14 +134,11 @@ class UC1(SIMD):
         odom_in_time.plot(time_odom,odom_linear_vel)
         odom_in_time.set_ylabel("odometry_velocity_x", fontsize=18)
         odom_in_time.set_xlabel("time(s)", fontsize=18)
-        odom_in_time.legend()
-        odom_in_time.legend()
         fig2.suptitle("Linear velocity given by odometry for each planar axis", fontsize=18)
 
         base_current_pose.plot(time_base_l_vel,cur_pose_lin_vel)
         base_current_pose.set_ylabel("base_link_current_linear_velocity_x", fontsize=18)
         base_current_pose.set_xlabel("time(s)", fontsize=18)
-        base_current_pose.legend()
         fig3.suptitle("Linear velocity given by base link current pose for each planar axis", fontsize=18)
 
         imu_y_axis_angular_velocity[0].plot(imu_time,imu_ang_vel_y[:,0])
@@ -149,8 +146,6 @@ class UC1(SIMD):
         imu_y_axis_angular_velocity[0].set_ylabel('Angular velocity - x axis', fontsize=18)
         imu_y_axis_angular_velocity[1].set_ylabel('Angular velocity - y axis', fontsize=18)
         imu_y_axis_angular_velocity[1].set_xlabel('time(s)', fontsize=18)
-        imu_y_axis_angular_velocity[1].legend()
-        imu_y_axis_angular_velocity[0].legend()
         fig4.suptitle("Angular velocity from IMU",fontsize=18)
 
         fig1.savefig(f"{data_path}/csv_images_files/trajectory.png")
