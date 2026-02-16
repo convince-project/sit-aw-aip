@@ -161,7 +161,7 @@ Shared variables
 
 .. code-block:: bash
 
-    identif \
+    inference_local \
     --use_case_id 1 \
     --anomaly_case_path home/root/Anomaly\1
 

@@ -1,7 +1,10 @@
 .. _docker-section:
 
-Requirements: Install docker
-============================
+Requirements 
+============
+
+Install Docker (for hosted model on server)
+-------------------------------------------
 
 **Linux (Ubuntu >= 22.04) -** `docker-documentation`_ **to also check other OSs**
 
@@ -63,8 +66,8 @@ Verify installation
 
     docker run hello-world
 
-Requirements: Install ros2 (humble)
-===================================
+Install ros2 (humble)
+---------------------
 
 Following these instructions :  `ros_doc`_
 
