@@ -45,7 +45,7 @@ This corresponds to a batch of data. One batch of data is related to one action 
 2. **Push instead of block**: Decision by the robot to push instead of block a larger or heavier object.
 3. **Block instead of push**: Decision by the robot to block rather than push a small and manageable object.
 4. **Failed to move despite pushing**: Situation where the object is too heavy or large for the robot to push, causing it to get stuck.
-5. **Other unspecified situations**: Situations not fitting into the above categories (e.g., system issues).
+5. **Unknown**: Situations not fitting into the above categories (e.g., system issues).
 
 **[OUTPUT FORMAT]**
 For your analysis, provide an explanation (few sentences) describing what observations led to your conclusion and fill this JSON structure with realistic data:

@@ -41,6 +41,7 @@ Gripper state has priority over visual motion.
 1. **The robot picked an object outside of the scope of manipulated objects**.
 2. **The robot picked nothing and a human has been seen**.
 3. **The robot picked nothing and no human has been seen**
+4. **Unknown**
 
 **[OUTPUT FORMAT]**
 For your analysis, provide an explanation (few sentences) describing what observations led to your conclusion and fill this JSON structure with realistic data:
