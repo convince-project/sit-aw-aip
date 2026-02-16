@@ -5,7 +5,7 @@ import tyro
 from dotenv import load_dotenv
 import os
 
-def main(use_case_id:int,anomaly_case_path:str,system_prompt:str=None):
+def main(use_case_id:int,anomaly_case_path:str,system_prompt:str=""):
     
     load_dotenv(dotenv_path="../.env")
     model = os.getenv("MODEL")
@@ -18,12 +18,20 @@ def main(use_case_id:int,anomaly_case_path:str,system_prompt:str=None):
     print('done init####################')
     
     if use_case_id == 2: #for now only this use case has critics
-        reply1,messages = inference.inference_with_hallucination_prevention(messages,critics_trigger_reply1)
-        print('done first inference ################')
-        messages.append({"role":"assistant","content":reply1})
-        messages.append({"role":"user","content":prompt2})
-        reply2,_ = inference.inference_with_hallucination_prevention(messages,critics_trigger_reply2,(reply1))
-        print('done second inference ################')
+        try: # the critics is not working anymore as we changed the prompt
+            reply1,messages = inference.inference_with_hallucination_prevention(messages,critics_trigger_reply1)
+            print('done first inference ################')
+            messages.append({"role":"assistant","content":reply1})
+            messages.append({"role":"user","content":prompt2})
+            reply2,_ = inference.inference_with_hallucination_prevention(messages,critics_trigger_reply2,(reply1))
+            print('done second inference ################')
+        except:
+            reply1 = inference.inference_with_api(messages)
+            print('done first inference ################')
+            messages.append({"role":"assistant","content":reply1})
+            messages.append({"role":"user","content":prompt2})
+            reply2 = inference.inference_with_api(messages)
+            print('done second inference ################')
     
     else :
         reply1 = inference.inference_with_api(messages)

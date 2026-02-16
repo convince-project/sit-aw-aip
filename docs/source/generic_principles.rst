@@ -31,10 +31,11 @@ the list, see below.
     :alt: Visual language model identification procedure.
 
 
-This project explains how to deploy your model, by default the same configuration as us, but 
-with the flexibility of changing it to the one you want.
+This project explains how to deploy your model, by default the same configuration as us, but with the flexibility of changing it to the one you want. 
 
-It also allows you to do anomalies identification with CONVINCE 3 uses-cases : Vacuum cleaner,
+You can also choose to do inference with a local model without hosting any; this limits you to using our configuration. You will also need around 10-15 GB of VRAM and the same of RAM.
+
+This project will allow you to do anomalies identification with CONVINCE 3 uses-cases : Vacuum cleaner,
 assembly robot and musuem guide.
 
 There is also an explanation of how to include your own use-case.

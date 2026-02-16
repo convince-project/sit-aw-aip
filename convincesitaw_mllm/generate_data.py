@@ -1,4 +1,3 @@
-#SIT-AW  Copyright (C) CEA 2025  Razane Azrou
 from convincesitaw_mllm.inference.Ucs_mapping import use_case_map
 import tyro
 

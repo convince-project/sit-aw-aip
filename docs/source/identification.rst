@@ -18,7 +18,7 @@ Build your project - Once
 
 .. code-block:: bash 
 
-    uv sync 
+    uv sync --frozen
 
 Activate virtual env - everytime you enter the project
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -27,27 +27,16 @@ Activate virtual env - everytime you enter the project
 
     source .venv/bin/activate
 
-Change environment variables
-----------------------------
+.. _generate_data: 
 
-You will have to change the variables within *.env* to match the one defined when deploying
-the model.
+Generate the right data format
+------------------------------
 
-**SERVER_IP** need to be the address of the serving hosting the model, else it will consider 
-localhost by default. 
-
-**Model** is the model you have chosen to deploy.
-
-**PORT** is the port exposed by docker that you defined when deploying.
-
-Format data - generate json (Once on a desired batch of data)
--------------------------------------------------------------
-
-**This script will generate the** :ref:`json_files <variables>` **that will be used by the model**
+**This script is in charge of formatting the data in accordance to what is expected by the model and given some required input and data structure.**
 
 .. code-block:: bash  
 
-    fData \
+    formatData \
     --use_case_id {id} \
     --root_path {root_path}
 
@@ -58,64 +47,34 @@ Variables
 
 **use_case_id** : 1,2 or 3 given CONVINCE Use cases order
 
-**root_path** : root_path to all anomalies data, the folders need to be structured this way given the use case :
+**root_path** : root_path to all anomalies data, the folders are structured the following way given the use case; only the *required* fields have to be present before hand :
 
 .. _uc1:
 
 UC1
 """
 
+**Think about sourcing your ROS environment and building any interfaces**
+
 .. code-block:: bash 
 
     -- root 
     -- Anomaly 1
-        -- excel_files
-                clif_sensors_data.xlsx
-                imu_data_data.xlsx
-                odometrie_data.xlsx
-                wheel_lift_data.xlsx
-        --images
+        -- csv_images_files (will be generated)
+                angular_imu_velocity.png
+                base_current_velocity.png
+                odom_vel.png
+                trajectory.png
+        -- images (will be generated)
                 [all images files]
-        -- json_files (optional)
+        -- text_files (will be generated)
+                class_action.txt
+        -- video (will be generated)
+                video.mp4
+        ros_file.mcap (required! with this extension!)
     -- Anomaly 2 (same as 1)
     -- Anomaly 3 (same as 1)
     -- (repeat)
-
-**The excel files columns and representation (elements in brackets represent numbers) - please refer for your data structure** :
-
-clif_sensors_data.xlsx :
-
-+---------------+-----------+
-|               | Data      |
-+===============+===========+
-| {timestamp_0} | {value_0} |
-+---------------+-----------+
-
-
-imu_data_data.xlsx :
-
-+---------------+---------------+---------------------------+--------------------+-------------------------------+-----------------------+----------------------------------------+
-|               | Orientation   | Orientation covariance    | Angular velocity   | Angular velocity covariance   | Linear Acceleration   | Linear Acceleration covariance         |
-+===============+===============+===========================+====================+===============================+=======================+========================================+
-| {timestamp_0} | {[list]}      | {[list]}                  | {[list]}           | {[list]}                      | {[list]}              | {[list]}                               |
-+---------------+---------------+---------------------------+--------------------+-------------------------------+-----------------------+----------------------------------------+
-
-odometrie_data.xlsx:
-
-+---------------+----------------+--------------------+------------------+---------------+----------------+------------------+
-|               | Pose position  | Pose orientation   | Pose covariance  | Twist linear  | Twist angular  | Twist covariance |
-+===============+================+====================+==================+===============+================+==================+
-| {timestamp_0} | {[list]}       | {[list]}           | {[list]}         | {[list]}      | {[list]}       | {[list]}         |
-+---------------+----------------+--------------------+------------------+---------------+----------------+------------------+
-
-
-wheel_lift_data.xlsx:
-
-+---------------+-----------+
-|               | Data      |
-+===============+===========+
-| {timestamp_0} | {value_0} |
-+---------------+-----------+
 
 .. _uc2:
 
@@ -127,12 +86,17 @@ UC2
     -- root 
     -- Anomaly 1
         -- block 1
-            -- folder 1 (the name is not important)
+            -- folder 1 (required!)
                     chest_cam_video.mp4
                     proprioception.csv
-            -- folder 2 (the name is not important)
+            -- folder 2 (required!)
                     scan_image.png
-            -- json_files (optional)
+            -- csv_images_files (will be generated)
+                    graph_image_csv_images_files.png
+            -- video (will be generated)
+                    video.mp4
+            -- images (will be generated)
+                    [all images files]
         -- block 2 (same as block1)
         -- block 3 (same as block1)
         -- (repeat)
@@ -149,37 +113,57 @@ UC2
 
 Other names in the *name* column can be present, but the **gripper_jaws** has to be.
 
-**Example given** :ref:`uc1 <uc1>` **previously presented data structre** :
+**Example given** :ref:`uc2 <uc2>` **previously presented data structre** :
 
 .. code-block:: bash 
 
-    fData \
-    --use_case_id 1 \
+    formatData \
+    --use_case_id 2 \
     --root_path home/root/
 
-Send an identification request to the VLM server
-------------------------------------------------
+Send an identification request to the VLM
+-----------------------------------------
+
+If you prefer to use a local VLM - works only with our chosen model
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. code-block:: bash 
 
-    identif \
+    inference_local \
     --use_case_id {id} \
     --anomaly_case_path {root_path_to_one_anomaly_case}
 
-Variables 
-"""""""""
+
+If you prefer the hosted VLM
+""""""""""""""""""""""""""""
+
+.. code-block:: bash 
+
+    inference_server \
+    --use_case_id {id} \
+    --anomaly_case_path {root_path_to_one_anomaly_case}
+
+
+Hosted VLM variables 
+""""""""""""""""""""
 
 There are three environment variables defined in the *.env* at the root. The **SERVER_IP** variable need to be changed to the IP of the distant machine where the model is hosted, else it will consider localhost and result in error.
 The two other variables **MODEL** and **PORT** have to correspond with the ones defined when deploying the model. 
 
+Shared variables 
+""""""""""""""""
+
 **use_case_id** : 1,2 or 3 given the use case you want to treat within CONVINCE use case.
 
-**anomaly_case_path**: within the selected use case and the [formatted data](#format-data---generate-json-once-on-a-desired-batch-of-data), the root_path to the desired anomaly to treat, where a *json_files* folder is. 
+**anomaly_case_path**: within the selected use case and the :ref:`formatted data <generate_data>`, the root_path to the desired anomaly to treat, where all folders are.
 
-**Example given** :ref:`uc2 <uc2>` **previously presented data structre** :
+**Example given** :ref:`uc1 <uc1>` **previously presented data structre** :
 
 .. code-block:: bash
 
     identif \
-    --use_case_id 2 \
-    --anomaly_case_path home/root/Anomaly\1/block\1/
+    --use_case_id 1 \
+    --anomaly_case_path home/root/Anomaly\1
+
+
+

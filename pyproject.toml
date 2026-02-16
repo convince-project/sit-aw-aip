@@ -27,7 +27,6 @@ dependencies = [
   "abcplus",
   "aiohttp==3.12.11",
   "litellm>=1.72.4",
-  "spatialmath-python>=1.1.14",
   "pybase64",
   "torch",
   "torchvision",
@@ -36,16 +35,23 @@ dependencies = [
   "tyro",
   "av",
   "python-dotenv",
-  "openpyxl",
   "critics",
+  "matplotlib",
+  "qwen-vl-utils",
+  "transformers",
+  "bitsandbytes",
+  "accelerate",
+  "decord",
+  "opencv-python"
 ]
 
 [tool.uv.sources]
 critics = {git = "https://github.com/convince-project/sit-aw-critics.git", branch= "mwe"}
 
 [project.scripts]
-fData = "convincesitaw_mllm.generate_json_files:cli"
-identif = "convincesitaw_mllm.send_identification_request_to_VLM:cli"
+formatData = "convincesitaw_mllm.generate_data:cli"
+inference_server = "convincesitaw_mllm.inference_with_hosted_VLM:cli"
+inference_local = "convincesitaw_mllm.inference_with_local_model:cli"
 
 [build-system]
 requires = ["hatchling >= 1.26"]

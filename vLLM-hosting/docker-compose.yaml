@@ -3,18 +3,20 @@ services:
   vllm_server:
     build:
       context: .
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile
     environment:
       NVIDIA_VISIBLE_DEVICES: all
       GPU_MEMORY_USAGE: ${GPU_MEMORY_USAGE}
       PORT: ${PORT}
       MODEL: ${MODEL}
+      DOWNLOAD_MODEL_CACHE_DIR: ${DOWNLOAD_MODEL_CACHE_DIR}
     runtime: nvidia
     ports:
       - "${PORT}:${PORT}"
     volumes:
       - ${DOWNLOAD_MODEL_CACHE_DIR}:/root/.cache/huggingface
     ipc: host
+
       
 
       

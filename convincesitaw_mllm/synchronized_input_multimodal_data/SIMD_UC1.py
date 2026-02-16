@@ -1,179 +1,215 @@
 #SIT-AW  Copyright (C) CEA 2025  Razane Azrou
-from glob import glob
-import os 
 from .SIMD_abstract import SIMD
-import pandas as pd
+import rosbag2_py
+from rclpy.serialization import deserialize_message
+from rosidl_runtime_py.utilities import get_message
+import matplotlib
+matplotlib.use("Agg")  # non-GUI backend
+import matplotlib.pyplot as plt
 import numpy as np
-import json
-from spatialmath.base import qnorm,qqmul
-import base64
-import ast
+from cv_bridge import CvBridge
+import cv2
+import math
+from glob import glob
+import os
 
+#For this I consider there is a rosbag encoded in mcap
+#need to be adapted if want to use a direct connection with ros
+#don't forget to source your workspace if needed
 class UC1(SIMD):
 
     def __init__(self):
+        
         super().__init__()
 
-    def statistics_to_get(self,array:np.array,boolean_not_numeric:bool):
 
-        if boolean_not_numeric:
-            redundancy = array[array == 1]
-            indexes = np.where(array==1)
-            return redundancy,indexes
-        if array.shape[1] <= 3:
-            mean = array.mean(axis=0)
-            std = array.std(axis=0)
-            return {"mean":mean,"std":std}
-        else : #should be quaternions
-            q_sum = np.sum(array,axis=0)
-            q_norm_sum = 0
-            for q in array:
-                q_norm_sum += qnorm(q)
-            q_mean = q_sum/q_norm_sum
-            variance = 0
-            for q in array :
-                d_geodesic = (1/np.pi)*np.arccos(qqmul(q_mean,q))
-                variance += d_geodesic**2
-            variance /= array.shape[0]
-            return {"mean":q_mean,"std":np.sqrt(variance)}
-        
-    def transform_str_to_numbers(self,data:pd.Series):
-        return data.apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
-    
-    def proprio_statistics(self,data_frame:pd.DataFrame,samples_nb:int) -> dict :
+    def read_extract_from_bag(self,data_path,reader,topic_types):
 
-        statistics_dict = {} 
+        odom_linear_vel = []
+        current_pose_diff_linear_vel = []
+        imu_ang_vel_y = []
+        trajectory_from_base_link = []
+        dv = []
+        time_odom = []
+        time_imu = []
+        time_base_l_vel = []
+        valid_images = []
+        bridge = CvBridge()
 
-        boolean_not_numeric = False
-        if data_frame.shape[1] <= 2: #for me this means there is timestamps + boolean data --> but I will need to find a common formatting of input data
-            boolean_not_numeric= True
+        i = 0
+        while reader.has_next():
+            topic,msg_data,_ = reader.read_next()
 
-        for col in data_frame.columns[1:]:
-            samples = []
-            data_frame.loc[:,col] = self.transform_str_to_numbers(data_frame[col])
-            array = np.array(data_frame[col].to_list())
-           
-            samples.append(array[0])
-            for i in range(1,array.shape[0]-2,array.shape[0]//samples_nb):
-                samples.append(array[i])
-            samples.append(array[-1])
+            if topic == "/odom":
+                
+                msg_type = get_message(topic_types[topic])
+                msg = deserialize_message(msg_data,msg_type)
+                t_ns = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+
+                vx = msg.twist.twist.linear.x
+                time_odom.append(t_ns)
+                odom_linear_vel.append(vx)
+
+            if topic == "/push_rl/selected_action":
+                
+                msg_type = get_message(topic_types[topic])
+                msg = deserialize_message(msg_data,msg_type)
+                obj_class = msg.detection.class_id
+                obj_estimated_h = msg.detection.height
+                obj_estimated_w = msg.detection.width
+                taken_decision = msg.taken_action
+
+            if topic == "/imu":
+                
+                msg_type = get_message(topic_types[topic])
+                msg = deserialize_message(msg_data,msg_type)
+                imu_time_ns = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+
+                time_imu.append(imu_time_ns)
+
+                ang_vel_x = msg.angular_velocity.x
+                ang_vel_y = msg.angular_velocity.y
             
-            statistics = self.statistics_to_get(array=array,boolean_not_numeric=boolean_not_numeric)
-            if boolean_not_numeric:
-                if statistics[0].shape[0] != 0:
-                    occurrences = np.array(data_frame[data_frame.columns[0]].to_list())[statistics[1]]
-                    duration = occurrences[-1]-occurrences[0]
-                    dict_entry = {"duration":duration,"redundancy":np.sum(statistics[0],dtype=float)}
-                else:
-                    dict_entry = {"duration":"No occurrence","redundancy":0.0}
-            else:
-                dict_entry = statistics
+                imu_ang_vel_y.append(np.array([ang_vel_x,ang_vel_y]))
+
+            if topic == "/realsense/camera/color/image_raw":
+                
+                msg_type = get_message(topic_types[topic])
+                msg = deserialize_message(msg_data,msg_type)
+
+                cv_img = bridge.imgmsg_to_cv2(msg,desired_encoding="passthrough")
+                cv2.imwrite(f"{data_path}/images/saved_image_{i}.jpg", cv_img)
+                valid_images.append(f"{data_path}/images/saved_image_{i}.jpg")
+                i+=1
+
+            if topic == "/base_link/current_pose":
+                msg_type = get_message(topic_types[topic])
+                msg = deserialize_message(msg_data,msg_type)
+                base_time = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+                
+                cc_x = msg.pose.position.x
+                cc_y = msg.pose.position.y
+
+                dv.append(cc_x)
+                if len(dv) == 2:
+                    time_base_l_vel.append(base_time)
+                    vx = dv[1] - dv[0]
+                    current_pose_diff_linear_vel.append(vx)
+                    dv = []
+
+                trajectory_from_base_link.append(np.array([cc_x,cc_y]))
+
+        fig1,trajectory = plt.subplots(1,figsize=(15,15))
+        fig2,odom_in_time = plt.subplots(1,figsize=(15,15))
+        fig3,base_current_pose = plt.subplots(1,figsize=(15,15))
+        fig4,imu_y_axis_angular_velocity = plt.subplots(2,1,sharex=True,sharey=True,figsize=(15,15))
+
+        time_odom = np.array(time_odom) - time_odom[0]
+        imu_time = np.array(time_imu) - time_imu[0]
+        time_base_l_vel = np.array(time_base_l_vel) - time_base_l_vel[0]
+
+        odom_linear_vel = np.array(odom_linear_vel)
+        imu_ang_vel_y = np.array(imu_ang_vel_y)
+        current_pose_diff_linear_vel = np.array(current_pose_diff_linear_vel)
+        trajectory_from_base_link = np.array(trajectory_from_base_link) 
+        distance= 0
+        for i in range(trajectory_from_base_link.shape[0]):
+            distance += math.sqrt(((trajectory_from_base_link[i,0]-trajectory_from_base_link[i-1,0])**2+(trajectory_from_base_link[i,1]-trajectory_from_base_link[i-1,1])**2))
+
+        cur_pose_lin_vel = []
+        for cur_l_pos,time_c_vel in zip(*(current_pose_diff_linear_vel,time_base_l_vel)):
+            cur_l_pos = cur_l_pos/(time_c_vel+10e-15)
+            cur_pose_lin_vel.append(cur_l_pos)
+
+        cur_pose_lin_vel = np.array(cur_pose_lin_vel)
+
+        trajectory.plot(trajectory_from_base_link[:,0],trajectory_from_base_link[:,1])
+        trajectory.scatter(trajectory_from_base_link[0,0], trajectory_from_base_link[0,1], color='blue', s=60, label='Start')
+        trajectory.scatter(trajectory_from_base_link[-1,0], trajectory_from_base_link[-1,1], color='red', s=60, label='End')
+        trajectory.set_xlabel('x', fontsize=18)
+        trajectory.set_ylabel('y', fontsize=18)
+        trajectory.legend()
+        fig1.suptitle("Trajectory", fontsize=18)
+
+        odom_in_time.plot(time_odom,odom_linear_vel)
+        odom_in_time.set_ylabel("odometry_velocity_x", fontsize=18)
+        odom_in_time.set_xlabel("time(s)", fontsize=18)
+        odom_in_time.legend()
+        odom_in_time.legend()
+        fig2.suptitle("Linear velocity given by odometry for each planar axis", fontsize=18)
+
+        base_current_pose.plot(time_base_l_vel,cur_pose_lin_vel)
+        base_current_pose.set_ylabel("base_link_current_linear_velocity_x", fontsize=18)
+        base_current_pose.set_xlabel("time(s)", fontsize=18)
+        base_current_pose.legend()
+        fig3.suptitle("Linear velocity given by base link current pose for each planar axis", fontsize=18)
+
+        imu_y_axis_angular_velocity[0].plot(imu_time,imu_ang_vel_y[:,0])
+        imu_y_axis_angular_velocity[1].plot(imu_time,imu_ang_vel_y[:,1])
+        imu_y_axis_angular_velocity[0].set_ylabel('Angular velocity - x axis', fontsize=18)
+        imu_y_axis_angular_velocity[1].set_ylabel('Angular velocity - y axis', fontsize=18)
+        imu_y_axis_angular_velocity[1].set_xlabel('time(s)', fontsize=18)
+        imu_y_axis_angular_velocity[1].legend()
+        imu_y_axis_angular_velocity[0].legend()
+        fig4.suptitle("Angular velocity from IMU",fontsize=18)
+
+        fig1.savefig(f"{data_path}/csv_images_files/trajectory.png")
+        fig2.savefig(f"{data_path}/csv_images_files/odom_vel.png")
+        fig3.savefig(f"{data_path}/csv_images_files/base_current_vel.png")
+        fig4.savefig(f"{data_path}/csv_images_files/angular_imu_vel.png")
+
+        with open(f"{data_path}/text_files/class_action.txt","w") as file:
+            file.write(f"class_id : {obj_class}\n")
+            file.write(f"object_width : {obj_estimated_w}\n")
+            file.write(f"object_height : {obj_estimated_h}\n")
+            file.write(f"taken_decision : {taken_decision}\n")
+            file.write(f"distance : {distance}\n")
+
+        avg_total_time = (time_odom[-1]+time_base_l_vel[-1]+imu_time[-1])/3
+        total_frame = len(valid_images)
+        fps = total_frame//avg_total_time
+
+        video_path = f"{data_path}/video/video.mp4"
+
+        if len(valid_images) !=0 :
+            first_image = cv2.imread(valid_images[0])
             
-            dict_entry['samples'] = samples
-            statistics_dict[col] = dict_entry
-
-        return statistics_dict
-    
-
-    def get_chunked_images_dict(self,frames,images_chunk_size):
-
-        images_dict = {}
-        for rec, iteration in enumerate(range(0,len(frames),images_chunk_size)):
-            chunk_dict = {}
-            for i in range(images_chunk_size):
-                with open(frames[iteration],"rb") as image_file:
-                    base64_image = base64.b64encode(image_file.read()).decode("utf-8")
-                    image_url = f"data:image/png;base64,{base64_image}"
-                chunk_dict[f"sample{i}"] = image_url
-            images_dict[f"image_chunk_{rec}"] = chunk_dict
-        return images_dict
-
-    def message_content_per_chunk(self,message,json_path:str,chunk_index:int):
-        with open(f"{json_path}/data_chunk_{chunk_index}.json","r") as chunk_file :
-            chunk = json.load(chunk_file)
-
-            text = f"""
-            Time : {chunk_index} second
-            Odometry :
-                Robot's position given by odometry : 
-                    mean : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Pose position"]["mean"]},
-                    std : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Pose position"]["std"]},
-                    samples : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Pose position"]["samples"]}
-
-                Robot's orientation given by odometry :
-                    mean : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Pose orientation"]["mean"]},
-                    std : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Pose orientation"]["std"]},
-                    samples : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Pose orientation"]["samples"]}
-                 
-                Robot's linear velocity given by odometry :  
-                    mean : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Twist linear"]["mean"]},
-                    std : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Twist linear"]["std"]},
-                    samples : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Twist linear"]["samples"]}
-               
-                Robot's angular velocity given by odometry :
-                    mean : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Twist angular"]["mean"]},
-                    std : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Twist angular"]["std"]},
-                    samples : {chunk[f"proprio_chunk{chunk_index}"][f"odometrie_data_chunk{chunk_index}"]["Twist angular"]["samples"]}
+            h, w, _ = first_image.shape
+            codec = cv2.VideoWriter_fourcc(*'mp4v')
+            vid_writer = cv2.VideoWriter(video_path, codec, fps, (w, h))
+            for img in valid_images:
+                loaded_img = cv2.imread(img) 
+                vid_writer.write(loaded_img)
                     
-            IMU :
-                Linear acceleration : 
-                    mean : {chunk[f"proprio_chunk{chunk_index}"][f"imu_data_data_chunk{chunk_index}"]["Linear Acceleration"]["mean"]},
-                    variance : {chunk[f"proprio_chunk{chunk_index}"][f"imu_data_data_chunk{chunk_index}"]["Linear Acceleration"]["std"]},
-                    samples : {chunk[f"proprio_chunk{chunk_index}"][f"imu_data_data_chunk{chunk_index}"]["Linear Acceleration"]["samples"]}
-             
-            Clif sensor :
-                Duration : {chunk[f"proprio_chunk{chunk_index}"][f"clif_sensors_data_chunk{chunk_index}"]["Data"]["duration"]},
-                Redundancy : {chunk[f"proprio_chunk{chunk_index}"][f"clif_sensors_data_chunk{chunk_index}"]["Data"]["redundancy"]},
-                samples : {chunk[f"proprio_chunk{chunk_index}"][f"clif_sensors_data_chunk{chunk_index}"]["Data"]["samples"]}
-            Wheel lift : 
-                Duration : {chunk[f"proprio_chunk{chunk_index}"][f"wheel_lift_data_chunk{chunk_index}"]["Data"]["duration"]},
-                Redundancy : {chunk[f"proprio_chunk{chunk_index}"][f"wheel_lift_data_chunk{chunk_index}"]["Data"]["redundancy"]},
-                samples : {chunk[f"proprio_chunk{chunk_index}"][f"wheel_lift_data_chunk{chunk_index}"]["Data"]["samples"]}
-
-            """
-            text_msg = {"type":"text","text":text}
-            message["content"].append(text_msg)
-            for image in chunk[f"image_chunk_{chunk_index}"].values():
-                image_msg = {"type":"image_url","image_url":{"url": image}}
-                message["content"].append(image_msg)
-            
-        return message
-
-
-    def get_data_name(self,excel_file:str):
-
-        name = excel_file.split("/")[-1] #get data name
-        name = name.split(".")[0] #remove extension
-        
-        return name
-
-    def main(self,root_path:str):
+            vid_writer.release()
+    
+    def main(self,root_path):
 
         data_folders = glob(root_path+"/*")
-        anomaly_iteration = 0
-        for anomaly in data_folders:
-            anomaly_path = os.path.join(root_path,anomaly)
-            #All proprioception data
-            excel_folder = os.path.join(anomaly_path,"excel_files")
-            excel_files = glob(excel_folder+"/*")
-            proprio_dict = {}
-            for excel_file in excel_files:
-                data_frame = pd.read_excel(excel_file,usecols=lambda x: "covariance" not in x)
-                data_frame = data_frame.rename(columns={"Unnamed: 0":"timestamp"})
-                data_name = self.get_data_name(excel_file)
-                chunked_dict = self.get_proprio_dict(data_name,data_frame,samples_nb=5)
-                
-                proprio_dict[f"{data_name}_{anomaly_iteration}"] = chunked_dict
+        for anomaly_folder in data_folders:
 
-            images_folder = os.path.join(anomaly_path,"images")
-            images = glob(images_folder+"/*.png")
-            total_time = 10 
-            images_chunkes = len(images)//total_time
-            images_dict = self.get_chunked_images_dict(images,images_chunkes)
-         
-            json_save_root_path = os.path.join(anomaly_path,f"json_files")
-            if not os.path.isdir(json_save_root_path):
-                os.mkdir(json_save_root_path)
-            
-            self.get_json_files(proprio_dict,images_dict,json_save_root_path)
-            
+            ros_bag_file = glob(anomaly_folder+f"/*.mcap")
+            if len(ros_bag_file)==0:
+                print(f"This {anomaly_folder} has been skipped, if it contains important data, you need to check if a mcap file is present within.")
+                continue
+            else:
+                ros_bag_file = ros_bag_file[0]
+
+            reader = rosbag2_py.SequentialReader()
+
+            storage_opts = rosbag2_py.StorageOptions(uri=ros_bag_file, storage_id="mcap")
+            converter_opts = rosbag2_py.ConverterOptions("","")
+
+            reader.open(storage_opts,converter_opts)
+            topic_types = {topic_info.name: topic_info.type for topic_info in reader.get_all_topics_and_types()}
+
+            if not os.path.isdir(anomaly_folder+"/csv_images_files"):
+                os.mkdir(anomaly_folder+"/csv_images_files")
+            if not os.path.isdir(anomaly_folder+"/images"):
+                os.mkdir(anomaly_folder+"/images")
+            if not os.path.isdir(anomaly_folder+"/text_files"):
+                os.mkdir(anomaly_folder+"/text_files")
+            if not os.path.isdir(anomaly_folder+"/video"):
+                os.mkdir(anomaly_folder+"/video") 
+
+            self.read_extract_from_bag(anomaly_folder,reader,topic_types)
