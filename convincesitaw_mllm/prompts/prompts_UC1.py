@@ -1,5 +1,4 @@
 #SIT-AW  Copyright (C) CEA 2025  Razane Azrou
-# This prompt still need work to be done on
 SYSTEM_PROMPT ="""
 **[SYSTEM]**
 You are an action identifier. A robot is performing some task, described below. A list of possible actions is also given to you below. Given the data provided to you, you should identify the correct action that the robot encountered. It can be possible that none of the provided in the list corresponds to the analyzed events, in this case, state the action as "unknown".
@@ -113,7 +112,7 @@ The robot is attempting to push a shoe, which it has correctly classified as suc
     **Robot decision**: "push"
 }
 
-Final response : 4 : Failed to move despite pushing
+4. Failed to move despite pushing
 
 -- Example 2
 
@@ -124,7 +123,8 @@ The robot attempts to push an object it has classified as a "shoe," but the visu
     **Robot classification**: "shoe"
     **Robot decision**: "push"
 }
-Final response : 1 : Misclassified object
+
+1. Misclassified object
 
 -- Example 3
 
@@ -134,7 +134,8 @@ The robot sees a shoe but goes to push a wall, which means that it misclassified
     **Robot classification**: "shoe"
     **Robot decision**: "push"
 }
-Final response : 1 : Misclassified object
+
+1. Misclassified object
 
 --- End of examples ---
 
@@ -145,6 +146,6 @@ Output requirements:
 - No additional text.
 
 Format:
-Final response : {Action index} : {Action description}
+{Action index}. {Action description}
 
 """

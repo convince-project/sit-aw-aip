@@ -1,3 +1,4 @@
+#SIT-AW  Copyright (C) CEA 2025  Razane Azrou
 SYSTEM_PROMPT ="""
 **[SYSTEM]**
 You are an action identifier. A robot is performing some task, described below. A list of possible actions is also given to you below. Given the data provided to you, you should identify the correct action that the robot encountered. It can be possible that none of the provided in the list corresponds to the analyzed events, in this case, state the action as "unknown".
@@ -108,7 +109,7 @@ The gripper jaws position starts at 0.165 (open) and gradually decreases, indica
 { "Object Type": "ring-shaped object", "Human Presence": "absent", "Environment": "indoor lab setting with a wooden table, cables, and a 'cea' logo on the wall", "Robot Position": "above the table, reaching for the ring-shaped object" }
 
 Correct action:
-Final response : 1 : The robot picked an object outside of the scope of manipulated objects
+1. The robot picked an object outside of the scope of manipulated objects
 
 --- Example 2
 Analysis:
@@ -116,21 +117,21 @@ The gripper jaws position decreases over time, indicating the gripper is closing
 { "Object Type": "nothing", "Human Presence": "present", "Environment": "lab setup with blocks on a wooden table", "Robot Position": "above the table, gripper open" }
 
 Correct action:
-Final response : 2 : The robot picked nothing and a human has been seen
+2. The robot picked nothing and a human has been seen
 
 --- Example 3
 Analysis:
 The gripper jaws position remains constant at approximately 0.165 throughout the observed time, which is above the 0.04 threshold indicating an open gripper. This means the gripper did not close to grasp any object. The video shows three parallelepiped blocks (two black, one red) on a wooden table — all within the scope of manipulated objects — but the robot did not interact with them. No human is visible in the scene. Therefore, the robot picked nothing, and no human was present.
 { "Object Type": "none", "Human Presence": "absent", "Environment": "A workspace with three blocks (two black, one red) on a wooden table, cables, and equipment in the background.", "Robot Position": "The robot is positioned above the table, with its gripper open and not interacting with any object." }
 
-Final response : 3 : The robot picked nothing and no human has been seen
+3. The robot picked nothing and no human has been seen
 
 --- Example 4
 Analysis:
 The gripper jaws position decreases over time, indicating the gripper is closing. At time 14 seconds, the position reaches 0.041, which is above the 0.04 threshold, suggesting the gripper is still closing but not yet fully grasping an object. However, at 15 seconds, the position stabilizes at 0.038, which is below 0.04, indicating the gripper is now closed. Since the gripper jaws are below 0.04 and close to 0.0, it implies the gripper is empty — meaning no object was successfully picked up. The video shows the robot arm moving toward a black block but does not show it grasping or lifting it. The environment is an indoor lab with no humans visible. The robot position is above the table, approaching the black block.
 { "Object Type": "nothing", "Human Presence": "absent", "Environment": "indoor lab with a wooden table, cables, and a CEA logo on the wall", "Robot Position": "above the table, approaching a black block" }
 
-Final response : 3 : The robot picked nothing and no human has been seen
+3. The robot picked nothing and no human has been seen
 
 --- End of examples ---
 
@@ -141,6 +142,6 @@ Output requirements:
 - No additional text.
 
 Format:
-Final response : {Action index} : {Action description}
+{Action index}. {Action description}
 
 """
