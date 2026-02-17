@@ -41,7 +41,7 @@ def main(use_case_id:int,anomaly_case_path:str,system_prompt:str=""):
     print(reply1)
     print(reply2)
 
-    return messages,inference,reply2
+    return messages,inference,reply2,model,processor
 
 def cli():
     tyro.cli(main)
