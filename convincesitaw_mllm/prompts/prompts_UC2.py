@@ -38,6 +38,7 @@ Do NOT use visible lifting as a requirement to decide that an object was picked.
 Gripper state has priority over visual motion.
 
 **[ACTIONS]**
+Format: {Action index}. **{Action description}**
 1. **The robot picked an object outside of the scope of manipulated objects**.
 2. **The robot picked nothing and a human has been seen**.
 3. **The robot picked nothing and no human has been seen**
@@ -143,6 +144,6 @@ Output requirements:
 - No additional text.
 
 Format:
-{Action index}. {Action description}
+{Action index as in ACTIONS list}. {Action description}
 
 """

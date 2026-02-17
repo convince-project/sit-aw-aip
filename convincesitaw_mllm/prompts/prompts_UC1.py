@@ -41,6 +41,7 @@ This corresponds to a batch of data. One batch of data is related to one action 
 - Important spikes that last in time with the IMU angular velocity mean that the robot has titled dangerously. The direction of the title depend on the axis on which the title has been observed (x or y). 
 
 **[ACTIONS]**
+Format: {Action index}. **{Action description}**: {Action explanation}
 1. **Misclassified object**: Event where the object’s classification by the robot deviates from its actual nature.
 2. **Push instead of block**: Decision by the robot to push instead of block a larger or heavier object.
 3. **Block instead of push**: Decision by the robot to block rather than push a small and manageable object.
@@ -146,6 +147,6 @@ Output requirements:
 - No additional text.
 
 Format:
-{Action index}. {Action description}
+{Action index as in the ACTIONS list}. {Action description}
 
 """
