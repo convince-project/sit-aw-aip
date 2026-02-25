@@ -65,10 +65,3 @@ Verify installation
 .. code-block:: bash
 
     docker run hello-world
-
-Install ros2 (humble)
----------------------
-
-Following these instructions :  `ros_doc`_
-
-.. _ros_doc: https://docs.ros.org/en/humble/Installation.html

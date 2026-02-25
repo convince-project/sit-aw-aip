@@ -54,8 +54,6 @@ Variables
 UC1
 """
 
-**Think about sourcing your ROS environment and building any interfaces. The data need to be stored in a rosbag.**
-
 .. code-block:: bash 
 
     -- root 
@@ -165,5 +163,33 @@ Shared variables
     --use_case_id 1 \
     --anomaly_case_path home/root/Anomaly\1
 
+Check with UC2 samples
+""""""""""""""""""""""
 
+Some samples are provided to you in the **examples** folder, which represents the root.
 
+Start by formatting the data:
+
+.. code-block:: bash
+
+    formatData \
+    --use_case_id 1 \
+    --root_path examples/
+
+Then, execute an inference with either the local or deployed model, by selecting one block folder:
+
+**local model**:
+
+.. code-block:: bash
+
+    inference_local \
+    --use_case_id 2 \
+    --anomaly_case_path examples/AN01/a58_00_2025_02_25_09_07_59
+
+**deployed model**:
+
+.. code-block:: bash
+
+    inference_server \
+    --use_case_id 2 \
+    --anomaly_case_path examples/AN01/a58_00_2025_02_25_09_07_59

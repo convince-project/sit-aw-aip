@@ -39,3 +39,7 @@ This project will allow you to do anomalies identification with CONVINCE 3 uses-
 assembly robot and musuem guide.
 
 There is also an explanation of how to include your own use-case.
+
+If you want to use the VLM for a more global action classification and integrate it to your setup using ROS2, check this project : `VLM_action_classification_ROS2`_
+
+.. _VLM_action_classification_ROS2: https://github.com/convince-project/VLM_local_action_classification_ROS

@@ -21,6 +21,8 @@ venv.bak/
 /docker-compose.yaml
 /.dockerignore
 
+.vscode/
+
 *.txt
 !licence-gpl-3.txt
 !requirements.txt
