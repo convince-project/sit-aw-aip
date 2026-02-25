@@ -24,7 +24,7 @@ class UC2(SIMD):
             ret, frame = cap.read()
             if not ret:
                 break
-            resized_image = cv2.resize(frame, (32, 32))
+            resized_image = cv2.resize(frame, (128, 128))
             output_path = os.path.join(images_path, f"frame_{frame_id:05d}.png")
             cv2.imwrite(output_path, resized_image)
             frame_id += 1
