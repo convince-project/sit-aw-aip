@@ -42,7 +42,8 @@ dependencies = [
   "bitsandbytes",
   "accelerate",
   "decord",
-  "opencv-python"
+  "opencv-python",
+  "scipy"
 ]
 
 [tool.uv.sources]
