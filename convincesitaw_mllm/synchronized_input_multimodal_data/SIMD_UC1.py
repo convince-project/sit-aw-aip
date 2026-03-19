@@ -37,10 +37,16 @@ class UC1(SIMD):
         time_base_l_vel = []
         valid_images = []
         bridge = CvBridge()
+        start_time = None
+        push_dec_msg = None
 
         i = 0
         while reader.has_next():
-            topic,msg_data,_ = reader.read_next()
+            topic,msg_data,msg_time_ns = reader.read_next()
+
+            msg_time_sec = msg_time_ns * 1e-09
+            if start_time is None:
+                start_time = msg_time_sec
 
             if topic == "/odom":
                 
@@ -53,13 +59,13 @@ class UC1(SIMD):
                 odom_linear_vel.append(vx)
 
             if topic == "/push_rl/selected_action":
-                
-                msg_type = get_message(topic_types[topic])
-                msg = deserialize_message(msg_data,msg_type)
-                obj_class = msg.detection.class_id
-                obj_estimated_h = msg.detection.height
-                obj_estimated_w = msg.detection.width
-                taken_decision = msg.taken_action
+                if push_dec_msg is None and 4.9 < (msg_time_sec - start_time) < 5.1:
+                    msg_type = get_message(topic_types[topic])
+                    push_dec_msg = deserialize_message(msg_data,msg_type)
+                    obj_class = push_dec_msg.detection.class_id
+                    obj_estimated_h = push_dec_msg.detection.height
+                    obj_estimated_w = push_dec_msg.detection.width
+                    taken_decision = push_dec_msg.taken_action
 
             if topic == "/imu":
                 
