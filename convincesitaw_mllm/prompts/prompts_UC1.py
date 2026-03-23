@@ -31,10 +31,10 @@ This corresponds to a batch of data. One batch of data is related to one action 
 - The pushed object is necessarily visible at the front, so aligned to the x-axis, of the robot and not on the sides, in the video.
 - The pushed object can stop being visible at some point in the video, as long as it was visible some frames before, in FRONT and not on the sides of the robot.
 - When odometry's linear velocity is around 0 this means that the wheels are not moving.
-- When the base link linear velocity is around 0, and not close to the extreems, it means the center of the robot is not moving. So it probably can't move because the object is to heavy or large for it, or because an obstacle is in the way.
-- When the tajectory is monotonous the robot is moving following a direction.
+- When the base link linear velocity is around 0, and not close to the extremes, it means the center of the robot is not moving. So it probably can't move because the object is to heavy or large for it, or because an obstacle is in the way.
+- When the trajectory is monotonous the robot is moving following a direction.
 - A change of monotony, 'sharp edges', in the trajectory means that the robot is turning.
-- Changes of regim in odometry, from 0 to spikes or vis-versa, represent 'turns' in the trajectory.
+- Changes of regime in odometry, from 0 to spikes or vis-versa, represent 'turns' in the trajectory.
 - Very low changes in the robot base link linear velocity, with possible spikes or important variations in odometry, mean the robot can't move because the object is to heavy or large for it, or because an obstacle is in the way.
 - Null values in both odometry and robot base link velocities, mean the whole robot is stopped; wheels included.
 - The IMU angular velocity is a bit noisy. 
@@ -60,20 +60,20 @@ For your analysis, provide an explanation (few sentences) describing what observ
 USER_PROMPT1="""
 You are provided with a batch of data corresponding to one robot action execution.
 
-Your task is to carefully analyze all the provided inputs (robot odometry linear velocity, robot base link linear velocity, robot's trajectory, video, robot detected object class id, robot detected objec width and height, and robot taken decision) in order to identify what happened.
+Your task is to carefully analyze all the provided inputs (robot odometry linear velocity, robot base link linear velocity, robot's trajectory, video, robot detected object class id, robot detected object width and height, and robot taken decision) in order to identify what happened.
 
 Follow these steps:
 
 1. Carefully inspect the data:
-   - Analyse the odometry, base link, trajectory and IMU graphs and use them to undestrand the robot's action and link it to its taken decision.
+   - Analyse the odometry, base link, trajectory and IMU graphs and use them to understand the robot's action and link it to its taken decision.
    - Observe the video to understand the surrounding environment and detected objects. 
-   - Compare the graphs and video to understand the robot's behaviour.
+   - Compare the graphs and video to understand the robot's behavior.
    - Use the video to classify the object, YOURSELF, independently of the robot's classification. 
    
 2. Reason about the action:
-   - Determine whether the robot missclassified the object or not.
+   - Determine whether the robot misclassified the object or not.
    - Determine whether the taken decision is correct: should the robot push or block the object?
-   - Determine whether, when the robot is right about pushing, it perfomes the action in a way that gets him unable to go forward or not.
+   - Determine whether, when the robot is right about pushing, it performs the action in a way that gets him unable to go forward or not.
    - Infer the most likely action class from the system prompt.
 
 3. If the situation is ambiguous:
@@ -84,7 +84,7 @@ Follow these steps:
 4. Produce your final answer.
 
 As a reminder the required output contains :
-An explanation (few sentences) describing what observations led to your conclusion and the following JSON structure synthetizing your final answer :
+An explanation (few sentences) describing what observations led to your conclusion and the following JSON structure synthesizing your final answer :
 {
     **Object seen in video**: "..."
     **Robot classification**: "..."
