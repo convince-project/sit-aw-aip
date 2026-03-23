@@ -38,7 +38,7 @@ This corresponds to a batch of data. One batch of data is related to one action 
 - Very low changes in the robot base link linear velocity, with possible spikes or important variations in odometry, mean the robot can't move because the object is to heavy or large for it, or because an obstacle is in the way.
 - Null values in both odometry and robot base link velocities, mean the whole robot is stopped; wheels included.
 - The IMU angular velocity is a bit noisy. 
-- Important spikes that last in time with the IMU angular velocity mean that the robot has titled dangerously. The direction of the title depend on the axis on which the title has been observed (x or y). 
+- Important spikes that last in time with the IMU angular velocity mean that the robot has tilted dangerously. The direction of the tilt depend on the axis on which the tilt has been observed (x or y). 
 
 **[ACTIONS]**
 Format: {Action index}. **{Action description}**: {Action explanation}
