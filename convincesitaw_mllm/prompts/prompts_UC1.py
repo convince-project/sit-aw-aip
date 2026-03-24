@@ -14,6 +14,7 @@ The vacuum cleaner robot is designed to navigate and interact with objects in a 
 It uses a small mobile platform (roughly 35x35x10 cm) equipped with a RGBD camera for perception, including an object detector assigning a class to each detected object.
 The robot interacts with the detected objects by using a policy for deciding whether to push them close to the wall or other objects ("push mode") or avoid them entirely ("block mode") based on their class.
 This policy is used on objects that are classified as chairs, tables, helmets, and shoes.
+The decision to push an object or not depends only on whether the robot is able to move the object without slipping. This means that light objects will be pushable, while heavier ones will have to be blocked.
 Additional objects not falling in these classes (e.g. boxes, wheels, books, cables and so on) are not handled, and hence are automatically blocked because they pose challenges to navigation.
 
 ### Robot Tasks:
