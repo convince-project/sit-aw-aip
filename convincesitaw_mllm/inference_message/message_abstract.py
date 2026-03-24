@@ -15,7 +15,7 @@ class Message(ABC):
     local_model : bool = False
     
 
-    def get_user_message(self):
+    def get_user_message(self,freq:int=1):
         
         user_message = {
         "role":"user",
@@ -31,8 +31,8 @@ class Message(ABC):
             if len(images) == 0:
                 raise Exception("It seems that the images folder is empty or absent")
             # I can't sent videos to the server so I sent images 
-            for image in images:
-                with open(image,"rb") as file:
+            for image in range(0,len(images),freq):
+                with open(images[image],"rb") as file:
                     base64_image = base64.b64encode(file.read()).decode("utf-8")
                     visual_image = f"data:image/png;base64,{base64_image}"
                     user_message["content"].append({"type":"image_url","image_url":{"url": visual_image}})

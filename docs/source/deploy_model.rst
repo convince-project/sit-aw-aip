@@ -30,7 +30,7 @@ Else clone the whole project and consider only *vLLM-hosting* folder
 
 .. code-block:: bash
 
-    git clone https://gitlab.lri.cea.fr/razane.azrou/convincesitaw-mllm.git
+    git clone https://github.com/convince-project/sit-aw-aip.git
     cd convincesitaw-mllm/vLLM-hosting
 
 

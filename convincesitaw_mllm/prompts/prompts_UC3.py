@@ -1,39 +1,36 @@
 #SIT-AW  Copyright (C) CEA 2025  Razane Azrou
 SYSTEM_PROMPT="""
-[SYSTEM]:
-You are a robotic system that has to guide the visitors inside a museum. You have to navigate through the museum, avoid people, and explain the exhibits to the visitors. You have a time limit to complete the list of tasks assigned to you.
-You have many sensors and actuators, which consists of:
+**[SYSTEM]**
+You are an action identifier. A robot is performing some task, described below. A list of possible actions is also given to you below. Given the data provided to you, you should identify the correct action that the robot encountered. It can be possible that none of the provided in the list corresponds to the analyzed events, in this case, state the action as "unknown".
+
+**[ROBOT and TASK]**
+
+### Robot System Overview:
+The robotic system has to guide the visitors inside a museum. It has to navigate through the museum, avoid people, and explain the exhibits to the visitors. the robt has a time limit to complete the list of tasks assigned to it.
+Many sensors and actuators are attached to it, which consists of:
 1. Cameras to capture images and videos of the environment that is on the top of your head.
 2. lidars to measure distances to objects and create 2d maps of the environment on the bottom of your body.
 3. Microphones to capture audio signals from the environment that is on the top of your head.
 4. Speakers to provide audio feedback to visitors that is on the top of your head.
 5. Wheels to move around the museum.
 
-[TASKS]:
-Your tasks are:
-- navigate from your current location to some pre-defined locations inside the museum.
+### Robot Tasks:
+- navigate from current location to some pre-defined locations inside the museum.
 - avoid people while navigating.
 - explain to visitors the exhibits they are seeing with a pre-defined set of explanations.
 - respond to visitors' questions about the exhibits.
 
+**[DATA INPUT]**
+- **Odometry** that represents how much the robot moved since its started.
+- **Lidar** that represents the distances to the nearest things (persons or objects) around you.
+- **Amcl_pose** that represents the robot estimated position in the museum.
+- **Camera (rgb)** that represents the visual information of the environment.
+- **Navigation_status** that represents the robot current navigation status.
+- **Audio** represented as an image that corresponds to the audio signals captured by the robot microphones.
+- **Text_to_speech component speak service** that represents the call to the robt speakers to provide audio feedback.
 
-[MANIPULATED OBJECTS]:
-you don't manipulate any objects.
-
-[DATA INPUT]:
-The data you will receive is:
-- your odometry that represents how much you moved since you started.
-- the lidar that represents the distances to the nearest persons who are around you.
-- the amcl_pose that represents your estimated position in the museum.
-- the camera (rgb + depth) that represents the visual information of the environment.
-- the navigation_status that represents your current navigation status.
-- the audio retrieved that represents the audio signals captured by your microphones.
-- the text_to_speech component speak service that represents the call to your speakers to provide audio feedback.
-- the wait_For_interaction status that represents whether you are waiting for interaction from visitors or whether you have received interaction.
-
-[KNOWN CORRELATIONS]:
-- There is a correlation between the navigation_status and the lidar data. If the navigation_status indicates that you are stuck, it is likely that there are people nearby as indicated by the lidar data.
-- There is a correlation between the audio retrieved data and the wait_For_interaction status. If the wait_For_interaction status indicates that you have received an interaction, it is likely that the audio retrieved data contains audio signals from visitors.
+**[KNOWN CORRELATIONS]**
+- There is a correlation between the navigation_status and the lidar data. If the navigation_status indicates that you are stuck, it is likely that there are people or obstacles nearby as indicated by the lidar data.
 - There is a correlation between the amcl_pose data and the navigation_status. If the navigation_status indicates that you are navigating, it is likely that the amcl_pose data shows that you are moving towards your destination.
 - There is a correlation between the odometry data and the amcl_pose data. If the odometry data indicates that you have moved a certain distance, it is likely that the amcl_pose data shows a corresponding change in your estimated position.
 - the navigation_status can be one of the following:
@@ -44,27 +41,27 @@ The data you will receive is:
   - STATUS_SUCCEEDED=4
   - STATUS_CANCELED=5
   - STATUS_ABORTED=6
-- the wait_For_interaction status can be one of the following:
-  - STATUS_UNKNOWN=0
-  - STATUS_ACCEPTED=1
-  - STATUS_EXECUTING=2
-  - STATUS_CANCELING=3
-  - STATUS_SUCCEEDED=4
-  - STATUS_CANCELED=5
-  - STATUS_ABORTED=6
 
+  
+**[ACTIONS]**
+1. location not reached because of obstacles (stuck) 
+2. location reached and obstacles (delayed)  
+3. people questions not understood (noisy environment)
+4. people questions understood (issue with text to speech component)
+5. unknown 
 
-For your analysis,
-please fill the following JSON structure with realistic data:
+**[OUTPUT FORMAT]**
+For your analysis, provide an explanation (few sentences) describing what observations led to your conclusion and fill this JSON structure with realistic data:
 {
     "data": {
-        "video": {
-            "people_in_front": true or false,
-            "people is speaking": true or false,
-            "people_count": number
+        "vision": {
+            "people_obstacles_in_front": true or false,
+            "people_speaking": true or false,
+            "people_count": number,
+            "obstacle_count": number
         },
         "lidar": {
-            "people_present": true or false,
+            "people_or_obstacle_present": true or false,
         },
         "audio": {
             "is understandable": true or false,
@@ -73,40 +70,102 @@ please fill the following JSON structure with realistic data:
         },
         "odometry": {
             "mean_pose_position": [x, y, z],
-            "mean_pose_orientation": [x, y, z, w],
             "mean_twist_linear": value,
-            "mean_twist_angular": value
         },
         "amcl_pose": {
             "estimated_position": [x, y, z],
-            "estimated_orientation": [x, y, z, w]
         },
         "navigation_status": {
             "status_code": "text",
         },
-        "interaction_status": {
-            "status_code": "text",
-        }
     },
     "task": {
         "performed_task": "navigate", "explain exhibit" or "answer question",
     },
 }
+"""
 
-Here is a list of situation descriptions:
-1. location not reached because of crowded environment (stuck) 
-2. location reached and crowded environment (delayed)  
-3. people questions not understood (noisy env)
-4. people questions understood (issue with text to speech component)
-5. unknown 
+USER_PROMPT1="""
+You are provided with a batch of data corresponding to one robot action execution.
 
+Your task is to carefully analyze all the provided inputs (robot odometry, lidar, amcl pose, vision, navigation status, audio and text to speech component) in order to identify what happened.
 
-Here are some examples of correct situations:
----
-Previous response:
-<POPULATED JSON STRUCTURE>
-Correct situation: <CORRESPONDING SITUATION>
----
-...
----
-""" 
+Follow these steps:
+
+1. Carefully inspect the data:
+   - Analyse the odometry and amcl position and try to see if the robot is stucked before reaching destination.
+   - Observe the video to understand the surrounding environment and detected objects. 
+   - See if the lidar coroborate the presence or absence of people or any obstacles.
+   - Analyse carefully the audio graph and text to speech component to find if the robot have any issues answering and if this is due to a misunderstanding of the question or noisy environment.
+   
+2. Reason about the action:
+   - Determine whether the robot reach its goal location or not.
+   - Determine whether the robot reached its goal location in time or not.
+   - Determine whether the robot could answer the question.
+   - Determine whether the robot could obtain a text from the question.
+
+3. If the situation is ambiguous:
+   - Re-analyze the sensor signals and visual cues.
+   - Consider alternative interpretations.
+   - Make the most informed decision possible based on the available evidence.
+
+4. Produce your final answer.
+
+As a reminder the required output contains :
+An explanation (few sentences) describing what observations led to your conclusion and the following JSON structure synthetizing your final answer :
+{
+    "data": {
+        "vision": {
+            "people_obstacles_in_front": true or false,
+            "people_speaking": true or false,
+            "people_count": number,
+            "obstacle_count": number
+        },
+        "lidar": {
+            "people_or_obstacle_present": true or false,
+        },
+        "audio": {
+            "is understandable": true or false,
+            "noise detected": true or false,
+            "speech to text": "text" or "",
+        },
+        "odometry": {
+            "mean_pose_position": [x, y, z],
+            "mean_twist_linear": value,
+        },
+        "amcl_pose": {
+            "estimated_position": [x, y, z],
+        },
+        "navigation_status": {
+            "status_code": "text",
+        },
+    },
+    "task": {
+        "performed_task": "navigate", "explain exhibit" or "answer question",
+    },
+}
+"""
+
+USER_PROMPT2="""
+
+You will now be given several classification examples.
+
+Each example contains:
+An explanation, a JSON output describing the situation and the correct action class associated with them.
+
+These examples are ONLY for the classification decision. Do NOT revise your JSON based on them.
+
+--- Classification Examples ---
+Empty for now. IGNORE IT!
+--- End of examples ---
+
+Now use YOUR previous explanation and JSON to classify into one action from the system prompt.
+
+Output requirements:
+- Output exactly one line.
+- No additional text.
+
+Format:
+{Action index as in the ACTIONS list}. {Action description}
+
+"""

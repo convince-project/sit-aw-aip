@@ -111,6 +111,29 @@ UC2
 
 Other names in the *name* column can be present, but the **gripper_jaws** has to be.
 
+UC3
+"""
+
+.. code-block:: bash
+
+    -- root 
+    -- Anomaly 1
+        -- csv_images_files (will be generated)
+                amcl.png
+                is_speaking.png
+                odom_vel.png
+                lidar.png
+                odom.png
+        -- images (will be generated)
+                [all images files]
+        -- video (will be generated)
+                video.mp4
+        ros_file.mcap (required! with this extension!)
+    -- Anomaly 2 (same as 1)
+    -- Anomaly 3 (same as 1)
+    -- (repeat)
+
+
 **Example given** :ref:`uc2 <uc2>` **previously presented data structre** :
 
 .. code-block:: bash 
