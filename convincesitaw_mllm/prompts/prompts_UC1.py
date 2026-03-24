@@ -40,6 +40,7 @@ This corresponds to a batch of data. One batch of data is related to one action 
 - Seeing the object identified by class id in the video does not mean that the classification is correct!
 - The pushed object is necessarily visible at the front, so aligned with the robot's x-axis, that is at the center of the video's frames.
 - The pushed object can stop being visible at some point in the video, as long as it was visible in the previous frames, IN THE CENTER AND NOT ON THE SIDES.
+- Focus on the object being visible at the center of the video five seconds after the video's start. Object in the previous frames might NOT be the target object.
 - When odometry's linear velocity is around 0 this means that the wheels (and therefore the robot) are not moving.
 - When the base-link's linear velocity is around 0, it means the robot is not moving. If in the meanwhile the odometry's linear velocity not 0, the robot is probably blocked because the object is too heavy or large for it, or because additional obstacles are on its way.
 - When the trajectory is monotonous the robot is moving following a direction.
@@ -52,6 +53,7 @@ This corresponds to a batch of data. One batch of data is related to one action 
 
 **[ACTIONS]**
 Format: {Action index}. **{Action description}**: {Action explanation}
+0. **Correct action**: The action taken by the robot is the correct one.
 1. **Misclassified object**: Event where the object’s classification by the robot deviates from its actual nature.
 2. **Robot pushed instead of blocking**: Decision by the robot to push instead of blocking a non-pushable object.
 3. **Robot blocked instead of pushing**: Decision by the robot to block instead of pushing a pushable object.
