@@ -155,7 +155,16 @@ The robot sees a shoe but goes to push a wall, which means that it misclassified
 
 -- Example 4
 
-TODO
+The robot correctly identifies a chair in the video and its classifier also labels it as a chair. However, the robot's policy decides to push it rather than block it. During the push attempt, the trajectory and velocity graphs reveal that the robot begins to drift: the base link linear velocity drops significantly toward zero while the odometry linear velocity remains at a higher value, indicating that the wheels are spinning but the robot is not actually advancing, likely because the chair is sliding sideways or the robot is losing traction. The video confirms the object is indeed a chair, and the correct decision should have been to block it.
+
+{
+    object_from_video: "a chair"
+    object_from_classifier: "chair"
+    decision_from_robot: "push"
+    decision_from_evaluation: "block"
+}
+
+2. Robot pushed instead of blocking
 
 --- End of examples ---
 
