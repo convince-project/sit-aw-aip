@@ -14,7 +14,7 @@ The vacuum cleaner robot is designed to navigate and interact with objects in a 
 It uses a small mobile platform (roughly 35x35x10 cm) equipped with a RGBD camera for perception, including an object detector assigning a class to each detected object.
 The robot interacts with the detected objects by using a policy for deciding whether to push them close to the wall or other objects ("push mode") or avoid them entirely ("block mode") based on their class.
 This policy is used on objects that are classified as chairs, tables, helmets, and shoes.
-The decision to push an object or not depends only on whether the robot is able to move the object without slipping. This means that light objects will be pushable, while heavier ones will have to be blocked.
+The decision to push an object or not depends only on whether the robot is able to move the object without slipping. This means that light objects, such as shoes, will be pushable, while heavier ones, such as tables, will have to be blocked.
 Additional objects not falling in these classes (e.g. boxes, wheels, books, cables and so on) are not handled, and hence are automatically blocked because they pose challenges to navigation.
 
 ### Robot Tasks:
@@ -66,8 +66,8 @@ For your analysis, provide an explanation (few sentences) describing what observ
 {
     object_from_video: the class of the object the robot tried to push, extracted from the provided video.
     object_from_classifier: the class of the object the robot tried to push as given in the input data.
-    decision_from_robot: the decision the robot's policy decided to execute (push or block).
-    decision_from_evaluation: the correct decision the robot should have executed, according to the provided information and outcome.
+    decision_from_robot: the decision the robot's policy decided to execute (push or block), as described in the user input.
+    decision_from_evaluation: the correct decision the robot should have executed, according to the evaluated video and additional robot's readings (push or block).
 }
 """
 

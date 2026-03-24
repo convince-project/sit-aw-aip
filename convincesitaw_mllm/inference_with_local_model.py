@@ -18,7 +18,7 @@ def main(use_case_id:int,anomaly_case_path:str,system_prompt:str=""):
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         model_path,
         quantization_config=bnb_config,
-        device_map="auto",
+        device_map="cuda:0",
         # Note: don't force torch_dtype here when using bitsandbytes quantization
     )
 
