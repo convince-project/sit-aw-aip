@@ -3,11 +3,14 @@ VLM deployment
 
 To deploy a VLM and use it, you will need a machine that contains more that 40 GB of Vram and more than 30 GB of cache memory (RAM).
 
+Deployment is done using `vLLM`_, v0.9.0. Be sure the model you want to deploy can be handled by it. 
+
 You will have to install :ref:`docker <docker-section>` and  install Nvidia container toolkit by following these `instructions`_.
 
 Once you selected the host machine for the model;
 
 .. _instructions: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+.. _vLLM: https://docs.vllm.ai/en/latest/
 
 Install the deploy part
 -----------------------
