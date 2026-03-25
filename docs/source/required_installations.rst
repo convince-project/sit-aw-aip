@@ -3,12 +3,6 @@
 Requirements 
 ============
 
-Git-LFS
--------
-
-.. code-block:: bash
-
-    sudo apt-get install git-lfs
 
 Install Docker (for hosted model on server)
 -------------------------------------------
