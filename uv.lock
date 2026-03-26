@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = "==3.10.*"
 resolution-markers = [
     "sys_platform == 'darwin'",
@@ -303,6 +303,7 @@ dependencies = [
     { name = "pybase64" },
     { name = "python-dotenv" },
     { name = "qwen-vl-utils" },
+    { name = "scipy" },
     { name = "torch" },
     { name = "torchvision" },
     { name = "transformers" },
@@ -329,6 +330,7 @@ requires-dist = [
     { name = "pybase64" },
     { name = "python-dotenv" },
     { name = "qwen-vl-utils" },
+    { name = "scipy" },
     { name = "torch" },
     { name = "torchvision" },
     { name = "transformers" },

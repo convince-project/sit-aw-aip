@@ -7,6 +7,7 @@ import matplotlib
 matplotlib.use("Agg")  # non-GUI backend
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 from cv_bridge import CvBridge
 import cv2
 import math
@@ -29,16 +30,23 @@ class UC1(SIMD):
         current_pose_diff_linear_vel = []
         imu_ang_vel_y = []
         trajectory_from_base_link = []
-        dv = []
+        curr_pose_baselink = None
+        curr_time_baselink = None
         time_odom = []
         time_imu = []
         time_base_l_vel = []
         valid_images = []
         bridge = CvBridge()
+        start_time = None
+        push_dec_msg = None
 
         i = 0
         while reader.has_next():
-            topic,msg_data,_ = reader.read_next()
+            topic,msg_data,msg_time_ns = reader.read_next()
+
+            msg_time_sec = msg_time_ns * 1e-09
+            if start_time is None:
+                start_time = msg_time_sec
 
             if topic == "/odom":
                 
@@ -51,13 +59,13 @@ class UC1(SIMD):
                 odom_linear_vel.append(vx)
 
             if topic == "/push_rl/selected_action":
-                
-                msg_type = get_message(topic_types[topic])
-                msg = deserialize_message(msg_data,msg_type)
-                obj_class = msg.detection.class_id
-                obj_estimated_h = msg.detection.height
-                obj_estimated_w = msg.detection.width
-                taken_decision = msg.taken_action
+                if push_dec_msg is None and 4.9 < (msg_time_sec - start_time) < 5.1:
+                    msg_type = get_message(topic_types[topic])
+                    push_dec_msg = deserialize_message(msg_data,msg_type)
+                    obj_class = push_dec_msg.detection.class_id
+                    obj_estimated_h = push_dec_msg.detection.height
+                    obj_estimated_w = push_dec_msg.detection.width
+                    taken_decision = push_dec_msg.taken_action
 
             if topic == "/imu":
                 
@@ -90,12 +98,23 @@ class UC1(SIMD):
                 cc_x = msg.pose.position.x
                 cc_y = msg.pose.position.y
 
-                dv.append(cc_x)
-                if len(dv) == 2:
-                    time_base_l_vel.append(base_time)
-                    vx = dv[1] - dv[0]
-                    current_pose_diff_linear_vel.append(vx)
-                    dv = []
+                qx = msg.pose.orientation.x
+                qy = msg.pose.orientation.y
+                qz = msg.pose.orientation.z
+                qw = msg.pose.orientation.w
+                yaw = R.from_quat([qx, qy, qz, qw]).as_euler("zyx")[0]
+
+                if curr_pose_baselink is not None:
+                    dt = base_time - curr_time_baselink
+                    if dt > 0:
+                        time_base_l_vel.append(base_time)
+                        dx = cc_x - curr_pose_baselink[0]
+                        dy = cc_y - curr_pose_baselink[1]
+                        # 2D world->base projection with yaw only.
+                        vx = (math.cos(yaw) * dx + math.sin(yaw) * dy) / dt
+                        current_pose_diff_linear_vel.append(vx)
+                curr_pose_baselink = (cc_x, cc_y)
+                curr_time_baselink = base_time
 
                 trajectory_from_base_link.append(np.array([cc_x,cc_y]))
 
@@ -116,13 +135,6 @@ class UC1(SIMD):
         for i in range(trajectory_from_base_link.shape[0]):
             distance += math.sqrt(((trajectory_from_base_link[i,0]-trajectory_from_base_link[i-1,0])**2+(trajectory_from_base_link[i,1]-trajectory_from_base_link[i-1,1])**2))
 
-        cur_pose_lin_vel = []
-        for cur_l_pos,time_c_vel in zip(*(current_pose_diff_linear_vel,time_base_l_vel)):
-            cur_l_pos = cur_l_pos/(time_c_vel+10e-15)
-            cur_pose_lin_vel.append(cur_l_pos)
-
-        cur_pose_lin_vel = np.array(cur_pose_lin_vel)
-
         trajectory.plot(trajectory_from_base_link[:,0],trajectory_from_base_link[:,1])
         trajectory.scatter(trajectory_from_base_link[0,0], trajectory_from_base_link[0,1], color='blue', s=60, label='Start')
         trajectory.scatter(trajectory_from_base_link[-1,0], trajectory_from_base_link[-1,1], color='red', s=60, label='End')
@@ -136,7 +148,7 @@ class UC1(SIMD):
         odom_in_time.set_xlabel("time(s)", fontsize=18)
         fig2.suptitle("Linear velocity given by odometry for each planar axis", fontsize=18)
 
-        base_current_pose.plot(time_base_l_vel,cur_pose_lin_vel)
+        base_current_pose.plot(time_base_l_vel,current_pose_diff_linear_vel)
         base_current_pose.set_ylabel("base_link_current_linear_velocity_x", fontsize=18)
         base_current_pose.set_xlabel("time(s)", fontsize=18)
         fig3.suptitle("Linear velocity given by base link current pose for each planar axis", fontsize=18)
