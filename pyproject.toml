@@ -23,26 +23,27 @@ keywords = [
 
 dependencies = [
   "numpy==1.26.4",
-  "pandas",
+  "pandas==1.4.1",
   "abcplus",
   "aiohttp==3.12.11",
   "litellm>=1.72.4",
   "pybase64",
-  "torch",
-  "torchvision",
+  "torch==2.6.0",
+  "torchvision==0.21.0",
   "dataclasses",
-  "ffmpeg-python",
-  "tyro",
-  "av",
+  "ffmpeg-python==0.2.0",
+  "tyro==0.9.19",
+  "av==13.0.0",
   "python-dotenv",
   "critics",
-  "matplotlib",
+  "matplotlib==3.5.1",
   "qwen-vl-utils",
   "transformers",
   "bitsandbytes",
-  "accelerate",
+  "accelerate==1.12.0",
   "decord",
-  "opencv-python"
+  "opencv-python",
+  "librosa==0.10.0"
 ]
 
 [tool.uv.sources]

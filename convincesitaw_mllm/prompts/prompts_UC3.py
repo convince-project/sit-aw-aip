@@ -34,21 +34,22 @@ Many sensors and actuators are attached to it, which consists of:
 - There is a correlation between the amcl_pose data and the navigation_status. If the navigation_status indicates that you are navigating, it is likely that the amcl_pose data shows that you are moving towards your destination.
 - There is a correlation between the odometry data and the amcl_pose data. If the odometry data indicates that you have moved a certain distance, it is likely that the amcl_pose data shows a corresponding change in your estimated position.
 - the navigation_status can be one of the following:
-  - STATUS_UNKNOWN=0
-  - STATUS_ACCEPTED=1
-  - STATUS_EXECUTING=2
-  - STATUS_CANCELING=3
-  - STATUS_SUCCEEDED=4
-  - STATUS_CANCELED=5
-  - STATUS_ABORTED=6
+    - NAVIGATION_STATUS_IDLE=0
+    - NAVIGATION_STATUS_PREPARING_BEFORE_MOVE=1
+    - NAVIGATION_STATUS_MOVING=2
+    - NAVIGATION_STATUS_WAITING_OBSTACLE=3
+    - NAVIGATION_STATUS_GOAL_REACHED=4
+    - NAVIGATION_STATUS_ABORTED=5
+    - NAVIGATION_STATUS_FAILING=6
+    - NAVIGATION_STATUS_PAUSED=7
+    - NAVIGATION_STATUS_THINKING=8
+    - NAVIGATION_STATUS_ERROR=9
 
   
 **[ACTIONS]**
-1. location not reached because of obstacles (stuck) 
-2. location reached and obstacles (delayed)  
-3. people questions not understood (noisy environment)
-4. people questions understood (issue with text to speech component)
-5. unknown 
+1. location reached and obstacles (delayed)  
+2. people questions not understood (noisy environment)
+3. unknown 
 
 **[OUTPUT FORMAT]**
 For your analysis, provide an explanation (few sentences) describing what observations led to your conclusion and fill this JSON structure with realistic data:

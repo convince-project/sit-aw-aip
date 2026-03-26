@@ -10,7 +10,7 @@ class Message_UC3(Message):
 
     def get_uc_specific_message(self):
         
-        messages = self.get_user_message(freq=10)
+        messages = self.get_user_message()
         ##will probably need to add navigation and other data not in csv_images, images and video
 
         return messages

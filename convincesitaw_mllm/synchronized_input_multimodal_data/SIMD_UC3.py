@@ -1,5 +1,4 @@
 #SIT-AW  Copyright (C) CEA 2025  Razane Azrou
-#SIT-AW  Copyright (C) CEA 2025  Razane Azrou
 from .SIMD_abstract import SIMD
 import rosbag2_py
 from rclpy.serialization import deserialize_message
@@ -13,6 +12,7 @@ import cv2
 import math
 from glob import glob
 import os
+import librosa
 
 #I subsampled lidar, odom and images because it is too high and the computer crashes
 class UC3(SIMD):
@@ -23,10 +23,8 @@ class UC3(SIMD):
 
 
     def read_extract_from_bag(self,data_path,reader,topic_types):
-
         
         odometry_positions = []
-        odometry_velocities = []
         amcl_positions = []
         lidar_lst = []
         valid_images = []
@@ -34,6 +32,7 @@ class UC3(SIMD):
         t_odom = []
         t_amcl = []
         bridge = CvBridge()
+        st_evolution = []
 
         i = 0
         skip = 0
@@ -48,15 +47,11 @@ class UC3(SIMD):
 
                 x = msg.pose.pose.position.x
                 y = msg.pose.pose.position.y
-                
-                vx = msg.twist.twist.linear.x
-                vy = msg.twist.twist.linear.y
-                
+            
                 t_odom.append(t_ns)
                 odometry_positions.append(np.array([x,y]))
-                odometry_velocities.append(np.array([vx,vy]))
 
-            if topic == "/laser_local" and skip%10==0:
+            if topic == "/laser_local" and skip%10==0 :
 
                 msg_type = get_message(topic_types[topic])
                 msg = deserialize_message(msg_data,msg_type)
@@ -75,6 +70,8 @@ class UC3(SIMD):
                 y_l = ranges*np.sin(angles_rad)
 
                 lidar_lst.append(np.array([x_l,y_l]))
+            
+            skip += 1 
 
             if topic == "/amcl_pose":
                 
@@ -97,7 +94,7 @@ class UC3(SIMD):
                 data = msg.data
                 is_speacking.append(data)
 
-            if topic == "/camera_rgbd/color/image_rect_color" and skip%10==0:
+            if topic == "/image_rgb" :
                 
                 msg_type = get_message(topic_types[topic])
                 msg = deserialize_message(msg_data,msg_type)
@@ -106,9 +103,16 @@ class UC3(SIMD):
                 cv2.imwrite(f"{data_path}/images/saved_image_{i}.png", cv_img)
                 valid_images.append(f"{data_path}/images/saved_image_{i}.png")
                 i+= 1
-            skip +=1
 
-        fig1,odom = plt.subplots(2,2,figsize=(15,15))
+            if topic == "/NavigationComponent/GoToPoi/_action/status":
+		
+                msg_type = get_message(topic_types[topic])
+                msg = deserialize_message(msg_data,msg_type)
+
+                status = msg.status_list[0].status
+                st_evolution.append(status)
+
+        fig1,odom = plt.subplots(2,1,figsize=(15,15))
         fig2,amcl = plt.subplots(2,1,figsize=(15,15))
         fig3,lidar = plt.subplots(1,figsize=(15,15))
         fig4,speaking = plt.subplots(1,figsize=(15,15))
@@ -116,22 +120,16 @@ class UC3(SIMD):
         # ################### Odometry ############################
         time_odom = np.array(t_odom) - t_odom[0]
         odometry_positions = np.array(odometry_positions)
-        odometry_velocities = np.array(odometry_velocities)
 
-        odom[0][0].plot(time_odom,odometry_positions[:,0])
-        odom[1][0].plot(time_odom,odometry_positions[:,1])
-        odom[0][1].plot(time_odom,odometry_velocities[:,0])
-        odom[1][1].plot(time_odom,odometry_velocities[:,1])
+        odom[0].plot(time_odom,odometry_positions[:,0])
+        odom[1].plot(time_odom,odometry_positions[:,1])
+        
+        odom[0].set_ylabel('odometry x position', fontsize=18)
+        odom[1].set_ylabel('odometry y position', fontsize=18)
+    
+        odom[1].set_xlabel('time(s)', fontsize=18)
 
-        odom[0][0].set_ylabel('odometry x position', fontsize=18)
-        odom[1][0].set_ylabel('odometry y position', fontsize=18)
-        odom[0][1].set_ylabel('odometry x velocity', fontsize=18)
-        odom[1][1].set_ylabel('odometry y velocity', fontsize=18)
-
-        odom[1][0].set_xlabel('time(s)', fontsize=18)
-        odom[1][1].set_xlabel('time(s)', fontsize=18)
-
-        fig1.suptitle("Odometry position and linear velocity",fontsize=18)
+        fig1.suptitle("Odometry position",fontsize=18)
         fig1.savefig(f"{data_path}/csv_images_files/odom.png")
 
         # ##########################################################
@@ -202,12 +200,30 @@ class UC3(SIMD):
                     
             vid_writer.release()
 
+        ######################################################
+        ################### navigation status ##########################
+        with open(f"{data_path}/text_files/navigation_status_evolution.txt","w") as file:
+            for s in range(len(st_evolution)):
+                file.write(f"status_{s} : {st_evolution[s]}\n")
+        
+    def convert_audio_to_melspec(self,audio_file):
+
+        fig, ax = plt.subplots()
+        array,sr = librosa.load(audio_file) #return tuple : array, sampling_rate is in Hz
+        S = librosa.feature.melspectrogram(y=array,sr=sr)
+        S_dB = librosa.power_to_db(S,ref=np.max)
+        img = librosa.display.specshow(S_dB, x_axis='time', y_axis='mel', sr=sr, ax=ax)
+        fig.colorbar(img, ax=ax, format='%+2.0f dB')
+        ax.set(title='Mel-frequency spectrogram')
+        print(audio_file)
+        fig.savefig(f"mel_spectorgam_{audio_file.split('/')[-1].split('.')[0]}")
+         
     def main(self,root_path):
 
         data_folders = glob(root_path+"/*")
         for anomaly_folder in data_folders:
 
-            ros_bag_file = glob(anomaly_folder+f"/*.mcap")
+            ros_bag_file = glob(anomaly_folder+"/*.mcap")
             if len(ros_bag_file)==0:
                 print(f"This {anomaly_folder} has been skipped, if it contains important data, you need to check if a mcap file is present within.")
                 continue
@@ -228,5 +244,17 @@ class UC3(SIMD):
                 os.mkdir(anomaly_folder+"/images")
             if not os.path.isdir(anomaly_folder+"/video"):
                 os.mkdir(anomaly_folder+"/video") 
+            if not os.path.isdir(anomaly_folder+"/text_files"):
+                os.mkdir(anomaly_folder+"/text_files")
 
             self.read_extract_from_bag(anomaly_folder,reader,topic_types)
+
+            audio_folder = glob(anomaly_folder+"/audio/*.wav")
+            if len(audio_folder) == 0:
+                raise Exception(f"No audio file detected at {anomaly_folder}/audio")
+
+            if not os.path.isdir(anomaly_folder+"/audio_images_files"):
+                os.mkdir(anomaly_folder+"/audio_images_files")
+            
+            for audio_file in audio_folder:
+                self.convert_audio_to_melspec(audio_file)
