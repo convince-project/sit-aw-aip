@@ -43,8 +43,9 @@ dependencies = [
   "accelerate==1.12.0",
   "decord",
   "opencv-python",
-  "librosa==0.10.0"
-  "scipy"
+  "librosa==0.10.0",
+  "scipy",
+  "setuptools<70"
 ]
 
 [tool.uv.sources]

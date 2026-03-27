@@ -150,10 +150,13 @@ class UC3(SIMD):
         x_r = odometry_positions[:,0][:,None] + subsampled_lidar[:,0,:]
         y_r = odometry_positions[:,1][:,None] + subsampled_lidar[:,1,:]
 
+        lidar.plot(odometry_positions[0,0],odometry_positions[0,1],'oy',label='start')
+        lidar.plot(odometry_positions[-1,0],odometry_positions[-1,1], 'og',label='end')
         for i in range(x_r.shape[0]):
             lidar.plot(odometry_positions[:,0],odometry_positions[:,1],'r')
             lidar.scatter(x_r[i, :], y_r[i, :],c="#1f77b4")
 
+        lidar.legend()
         fig3.suptitle("lidar",fontsize=18)
         fig3.savefig(f"{data_path}/csv_images_files/lidar.png")
 
@@ -206,7 +209,7 @@ class UC3(SIMD):
             for s in range(len(st_evolution)):
                 file.write(f"status_{s} : {st_evolution[s]}\n")
         
-    def convert_audio_to_melspec(self,audio_file):
+    def convert_audio_to_melspec(self,audio_file,data_path):
 
         fig, ax = plt.subplots()
         array,sr = librosa.load(audio_file) #return tuple : array, sampling_rate is in Hz
@@ -215,8 +218,9 @@ class UC3(SIMD):
         img = librosa.display.specshow(S_dB, x_axis='time', y_axis='mel', sr=sr, ax=ax)
         fig.colorbar(img, ax=ax, format='%+2.0f dB')
         ax.set(title='Mel-frequency spectrogram')
-        print(audio_file)
-        fig.savefig(f"mel_spectorgam_{audio_file.split('/')[-1].split('.')[0]}")
+        file_name = audio_file.split('/')[-1].split('.')[0]
+        fig.savefig(f"{data_path}/audio_images_files/mel_spectorgam_{file_name}.png")
+        plt.close()
          
     def main(self,root_path):
 
@@ -257,4 +261,4 @@ class UC3(SIMD):
                 os.mkdir(anomaly_folder+"/audio_images_files")
             
             for audio_file in audio_folder:
-                self.convert_audio_to_melspec(audio_file)
+                self.convert_audio_to_melspec(audio_file,anomaly_folder)

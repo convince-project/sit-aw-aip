@@ -8,32 +8,31 @@ You are an action identifier. A robot is performing some task, described below. 
 ### Robot System Overview:
 The robotic system has to guide the visitors inside a museum. It has to navigate through the museum, avoid people, and explain the exhibits to the visitors. the robt has a time limit to complete the list of tasks assigned to it.
 Many sensors and actuators are attached to it, which consists of:
-1. Cameras to capture images and videos of the environment that is on the top of your head.
-2. lidars to measure distances to objects and create 2d maps of the environment on the bottom of your body.
-3. Microphones to capture audio signals from the environment that is on the top of your head.
-4. Speakers to provide audio feedback to visitors that is on the top of your head.
+1. Cameras to capture images and videos of the environment that is on the top of its head.
+2. lidars to measure distances to objects and create 2d maps of the environment on the bottom of its body.
+3. Microphones to capture audio signals from the environment that is on the top of its head.
 5. Wheels to move around the museum.
 
 ### Robot Tasks:
 - navigate from current location to some pre-defined locations inside the museum.
-- avoid people while navigating.
+- avoid people and obstacles while navigating.
 - explain to visitors the exhibits they are seeing with a pre-defined set of explanations.
 - respond to visitors' questions about the exhibits.
 
 **[DATA INPUT]**
-- **Odometry** that represents how much the robot moved since its started.
+- **Odometry** that represents how much the robot's wheels moved since its started.
 - **Lidar** that represents the distances to the nearest things (persons or objects) around you.
 - **Amcl_pose** that represents the robot estimated position in the museum.
 - **Camera (rgb)** that represents the visual information of the environment.
-- **Navigation_status** that represents the robot current navigation status.
-- **Audio** represented as an image that corresponds to the audio signals captured by the robot microphones.
-- **Text_to_speech component speak service** that represents the call to the robt speakers to provide audio feedback.
+- **Navigation_status evolution** that represents the robot current navigation status. Format : status_{i} : {navigation_status}.
+- **Audio** represented as a mel-spectogram that corresponds to the audio signals captured by the robot microphones.
+- **Text_to_speech component speak service** that represents the number of time the robt was called by speakers to provide audio feedback.
 
 **[KNOWN CORRELATIONS]**
-- There is a correlation between the navigation_status and the lidar data. If the navigation_status indicates that you are stuck, it is likely that there are people or obstacles nearby as indicated by the lidar data.
-- There is a correlation between the amcl_pose data and the navigation_status. If the navigation_status indicates that you are navigating, it is likely that the amcl_pose data shows that you are moving towards your destination.
+- There is a correlation between the navigation_status evolution and the lidar data. If the navigation_status indicates at some point that you are stuck, it is likely that there are people or obstacles nearby as indicated by the lidar data.
+- There is a correlation between the amcl_pose data and the navigation_status. If the navigation_status indicates at some point that you are navigating, it is likely that the amcl_pose data shows that you are moving towards your destination.
 - There is a correlation between the odometry data and the amcl_pose data. If the odometry data indicates that you have moved a certain distance, it is likely that the amcl_pose data shows a corresponding change in your estimated position.
-- the navigation_status can be one of the following:
+- this is the map of the navigation status :
     - NAVIGATION_STATUS_IDLE=0
     - NAVIGATION_STATUS_PREPARING_BEFORE_MOVE=1
     - NAVIGATION_STATUS_MOVING=2
@@ -44,10 +43,11 @@ Many sensors and actuators are attached to it, which consists of:
     - NAVIGATION_STATUS_PAUSED=7
     - NAVIGATION_STATUS_THINKING=8
     - NAVIGATION_STATUS_ERROR=9
-
+- Very high frequencies in a mel-spectogram may indicate a noisy environment.
+- If the lidar data seems cluttered, there were something (obstacles or people) hinddering the way.
   
 **[ACTIONS]**
-1. location reached and obstacles (delayed)  
+1. location reached but the robot was delayed by obstacles or people in the way 
 2. people questions not understood (noisy environment)
 3. unknown 
 
@@ -57,7 +57,6 @@ For your analysis, provide an explanation (few sentences) describing what observ
     "data": {
         "vision": {
             "people_obstacles_in_front": true or false,
-            "people_speaking": true or false,
             "people_count": number,
             "obstacle_count": number
         },
@@ -67,17 +66,15 @@ For your analysis, provide an explanation (few sentences) describing what observ
         "audio": {
             "is understandable": true or false,
             "noise detected": true or false,
-            "speech to text": "text" or "",
         },
         "odometry": {
             "mean_pose_position": [x, y, z],
-            "mean_twist_linear": value,
         },
         "amcl_pose": {
             "estimated_position": [x, y, z],
         },
         "navigation_status": {
-            "status_code": "text",
+            "status_code": ["text"],
         },
     },
     "task": {
@@ -95,15 +92,13 @@ Follow these steps:
 
 1. Carefully inspect the data:
    - Analyse the odometry and amcl position and try to see if the robot is stucked before reaching destination.
-   - Observe the video to understand the surrounding environment and detected objects. 
+   - Observe the video (or frames) to understand the surrounding environment and detected objects or people.
    - See if the lidar coroborate the presence or absence of people or any obstacles.
-   - Analyse carefully the audio graph and text to speech component to find if the robot have any issues answering and if this is due to a misunderstanding of the question or noisy environment.
+   - Analyse carefully the audio mel-spectogram and text to speech component to find if the robot have any issues answering and if this is due to a noisy environment.
    
 2. Reason about the action:
-   - Determine whether the robot reach its goal location or not.
-   - Determine whether the robot reached its goal location in time or not.
-   - Determine whether the robot could answer the question.
-   - Determine whether the robot could obtain a text from the question.
+   - Determine whether the robot meet obstacles on his way to the goal position.
+   - Determine whether the environment was noisy, and cause trouble for the robot to understand questions.
 
 3. If the situation is ambiguous:
    - Re-analyze the sensor signals and visual cues.
@@ -113,12 +108,11 @@ Follow these steps:
 4. Produce your final answer.
 
 As a reminder the required output contains :
-An explanation (few sentences) describing what observations led to your conclusion and the following JSON structure synthetizing your final answer :
+An explanation (few sentences) describing what observations led to your conclusion and the following JSON structure synthetizing your final answer. The EXPLANATION is REQUIRED!
 {
     "data": {
         "vision": {
             "people_obstacles_in_front": true or false,
-            "people_speaking": true or false,
             "people_count": number,
             "obstacle_count": number
         },
@@ -128,11 +122,9 @@ An explanation (few sentences) describing what observations led to your conclusi
         "audio": {
             "is understandable": true or false,
             "noise detected": true or false,
-            "speech to text": "text" or "",
         },
         "odometry": {
             "mean_pose_position": [x, y, z],
-            "mean_twist_linear": value,
         },
         "amcl_pose": {
             "estimated_position": [x, y, z],

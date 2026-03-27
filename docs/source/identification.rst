@@ -128,6 +128,12 @@ UC3
                 [all images files]
         -- video (will be generated)
                 video.mp4
+        -- audio_images_files (will be generated)
+                [all mel spectograms]
+        -- text_files (will be generated)
+                navigation_status_evolution.txt
+        -- audio (required!)
+                [*.wav files] (extension required)
         ros_file.mcap (required! with this extension!)
     -- Anomaly 2 (same as 1)
     -- Anomaly 3 (same as 1)

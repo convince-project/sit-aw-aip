@@ -2,6 +2,7 @@
 from .message_abstract import Message
 from glob import glob
 import os 
+import base64
 
 class Message_UC3(Message):
 
@@ -10,7 +11,32 @@ class Message_UC3(Message):
 
     def get_uc_specific_message(self):
         
-        messages = self.get_user_message()
-        ##will probably need to add navigation and other data not in csv_images, images and video
+        messages = self.get_user_message(freq=100)
+        #navigation status evolution
+        txt_path = glob(os.path.join(self.anomaly_case_path,"text_files/*.txt"))
+        if len(txt_path) == 0:
+            raise Exception(f"You need a txt file for UC3, the path : {self.anomaly_case_path}, may be incorrect or missing the text_files folder.")
+        else:
+            txt_path = txt_path[0]
+
+        with open(txt_path) as file:
+            text = file.read()
+
+        messages[1]["content"].append({"type":"text","text":text})
+
+        spectograms_files = glob(os.path.join(self.anomaly_case_path,"audio_images_files/*.png"))
+        if len(spectograms_files) == 0:
+            raise Exception(f"You need audio mel spectograms images for UC3, the path : {spectograms_files}, may be incorrect")
+
+        for mel_spec in spectograms_files: 
+            if not self.local_model:
+                with open(mel_spec,"rb") as scan_file:
+                    base64_image = base64.b64encode(scan_file.read()).decode("utf-8")
+                    image = f"data:image/png;base64,{base64_image}"
+                    extra_message = {"type":"image_url","image_url":{"url": image}}
+            else:
+                extra_message = {"image":mel_spec}
+            
+            messages[1]["content"].append(extra_message)
 
         return messages
