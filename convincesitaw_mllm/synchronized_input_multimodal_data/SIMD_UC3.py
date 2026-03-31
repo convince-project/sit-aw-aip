@@ -13,6 +13,7 @@ import math
 from glob import glob
 import os
 import librosa
+from warnings import warn
 
 #I subsampled lidar, odom and images because it is too high and the computer crashes
 class UC3(SIMD):
@@ -33,11 +34,22 @@ class UC3(SIMD):
         t_amcl = []
         bridge = CvBridge()
         st_evolution = []
+        questions = []
 
         i = 0
         skip = 0
         while reader.has_next():
             topic,msg_data,_ = reader.read_next()
+
+            if topic == "/DialogComponent/interaction":
+		
+                msg_type = get_message(topic_types[topic])
+                msg = deserialize_message(msg_data,msg_type)
+                if len(msg.text) == 0:
+                    message = 'empty string'
+                else:
+                    message = msg.text
+                questions.append(message)
 
             if topic == "/odometry" and skip%10==0 :
     
@@ -206,18 +218,28 @@ class UC3(SIMD):
         ######################################################
         ################### navigation status ##########################
         with open(f"{data_path}/text_files/navigation_status_evolution.txt","w") as file:
+            file.write(f"Those represent the navigation statue evolution in time:\n")
             for s in range(len(st_evolution)):
                 file.write(f"status_{s} : {st_evolution[s]}\n")
-        
-    def convert_audio_to_melspec(self,audio_file,data_path):
 
+         ######################################################
+        ################### interaction ##########################
+        if len(questions) != 0 :
+            with open(f"{data_path}/text_files/interation.txt","w") as file:
+                file.write(f"Those are the questions asked to the robot in order, they can be empty:\n")
+                for s in range(len(questions)):
+                    file.write(f"status_{s} : {questions[s]}\n")
+            
+    def convert_audio_to_melspec(self,audio_file,data_path):
+        
+        file_name = audio_file.split("/")[-1].split(".")[0]
         fig, ax = plt.subplots()
         array,sr = librosa.load(audio_file) #return tuple : array, sampling_rate is in Hz
         S = librosa.feature.melspectrogram(y=array,sr=sr)
         S_dB = librosa.power_to_db(S,ref=np.max)
         img = librosa.display.specshow(S_dB, x_axis='time', y_axis='mel', sr=sr, ax=ax)
         fig.colorbar(img, ax=ax, format='%+2.0f dB')
-        ax.set(title='Mel-frequency spectrogram')
+        ax.set(title=f'{file_name}')
         file_name = audio_file.split('/')[-1].split('.')[0]
         fig.savefig(f"{data_path}/audio_images_files/mel_spectorgam_{file_name}.png")
         plt.close()
@@ -255,7 +277,8 @@ class UC3(SIMD):
 
             audio_folder = glob(anomaly_folder+"/audio/*.wav")
             if len(audio_folder) == 0:
-                raise Exception(f"No audio file detected at {anomaly_folder}/audio")
+                warn(f"No audio file detected at {anomaly_folder}/audio")
+                continue
 
             if not os.path.isdir(anomaly_folder+"/audio_images_files"):
                 os.mkdir(anomaly_folder+"/audio_images_files")

@@ -27,6 +27,7 @@ Many sensors and actuators are attached to it, which consists of:
 - **Navigation_status evolution** that represents the robot current navigation status. Format : status_{i} : {navigation_status}.
 - **Audio** represented as a mel-spectogram that corresponds to the audio signals captured by the robot microphones.
 - **Text_to_speech component speak service** that represents the number of time the robt was called by speakers to provide audio feedback.
+- **Interaction list** that represents all the interactions the robot had.
 
 **[KNOWN CORRELATIONS]**
 - There is a correlation between the navigation_status evolution and the lidar data. If the navigation_status indicates at some point that you are stuck, it is likely that there are people or obstacles nearby as indicated by the lidar data.
@@ -45,6 +46,8 @@ Many sensors and actuators are attached to it, which consists of:
     - NAVIGATION_STATUS_ERROR=9
 - Very high frequencies in a mel-spectogram may indicate a noisy environment.
 - If the lidar data seems cluttered, there were something (obstacles or people) hinddering the way.
+- If an interaction is represented by empty string, than the robot did not understand and the environment is probably noisy.
+- If several interactions are repeated the robot did probably not understand and the environment is probably noisy.
   
 **[ACTIONS]**
 1. location reached but the robot was delayed by obstacles or people in the way 
@@ -94,7 +97,8 @@ Follow these steps:
    - Analyse the odometry and amcl position and try to see if the robot is stucked before reaching destination.
    - Observe the video (or frames) to understand the surrounding environment and detected objects or people.
    - See if the lidar coroborate the presence or absence of people or any obstacles.
-   - Analyse carefully the audio mel-spectogram and text to speech component to find if the robot have any issues answering and if this is due to a noisy environment.
+   - Analyse carefully the audio mel-spectogram and try to see if any noise is detected in any of them.
+   - Analyse the interaction list and text to speech component to find if the robot have any issues answering and if this is due to a noisy environment.
    
 2. Reason about the action:
    - Determine whether the robot meet obstacles on his way to the goal position.
