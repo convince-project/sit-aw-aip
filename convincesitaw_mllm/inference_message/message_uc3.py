@@ -12,18 +12,20 @@ class Message_UC3(Message):
 
     def get_uc_specific_message(self):
         
-        messages = self.get_user_message(freq=100)
-        #navigation status evolution + interaction if any
-        txt_path = glob(os.path.join(self.anomaly_case_path,"text_files/*.txt"))
+        messages = self.get_user_message(freq=200)
+ 
+        # Navigation status evolution + interaction + service events + feedback
+        txt_path = glob(os.path.join(self.anomaly_case_path, "text_files/*.txt"))
         if len(txt_path) == 0:
             raise Exception(f"You need a txt file for UC3, the path : {self.anomaly_case_path}, may be incorrect or missing the text_files folder.")
         else:
             for txt_file in txt_path:
                 with open(txt_file) as file:
                     text = file.read()
-                messages[1]["content"].append({"type":"text","text":text})
-
-        spectograms_files = glob(os.path.join(self.anomaly_case_path,"audio_images_files/*.png"))
+                messages[1]["content"].append({"type": "text", "text": text})
+ 
+        # Mel-spectrograms
+        spectograms_files = glob(os.path.join(self.anomaly_case_path, "audio_images_files/*.png"))
         if len(spectograms_files) == 0:
             warn(f"You may need audio mel spectograms images for UC3, the path : {spectograms_files}, is empty")
         else: 
